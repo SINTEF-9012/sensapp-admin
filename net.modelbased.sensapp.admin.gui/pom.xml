@@ -5,17 +5,35 @@
   <artifactId>net.modelbased.sensapp.admin.gui</artifactId>
   <packaging>war</packaging>
   <version>0.0.1-SNAPSHOT</version>
-  <name>net.modelbased.sensapp.admin.gui Maven Webapp</name>
-  <url>http://maven.apache.org</url>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+  <name>SensApp Web Administration and Visualization</name>
+  <url>http://sensapp.modelbased.net</url>
+  
+  <repositories>
+    <repository>
+  	  <id>jetty</id>
+      <name>Jetty Repository</name>
+      <url>http://oss.sonatype.org/content/groups/jetty/</url>
+    </repository>
+  </repositories>
+  
   <build>
-    <finalName>net.modelbased.sensapp.admin.gui</finalName>
+  <finalName>sensapp-admin_${project.version}</finalName>
+    <plugins>
+      <plugin>
+  	    <groupId>org.mortbay.jetty</groupId>
+ 	    <artifactId>jetty-maven-plugin</artifactId>
+ 	    <version>8.1.3.v20120416</version>
+ 	    <configuration>
+ 	      <stopPort>9999</stopPort>
+          <stopKey>${project.artifactId}</stopKey>
+          <connectors>
+	 	      <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
+	 	      <port>9090</port>
+	 	      </connector>
+ 	      </connectors>
+ 	    </configuration>
+ 	    
+	  </plugin>
+    </plugins>
   </build>
 </project>
