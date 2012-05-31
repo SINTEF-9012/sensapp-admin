@@ -1,0 +1,11 @@
+{
+  "nodes": [
+    { "name": "cloud", "srv": "46.51.169.123", "port": 8080 }
+  ],
+  "deployment": [
+  	{ "service": "database.raw", "node": "cloud" },
+  	{ "service": "dispatch",     "node": "cloud" },
+  	{ "service": "notifier",     "node": "cloud" },
+  	{ "service": "registry",     "node": "cloud" }
+  ]
+}
