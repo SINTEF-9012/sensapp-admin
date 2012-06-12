@@ -6,7 +6,7 @@
   <head>
 	<script src="http://code.jquery.com/jquery-latest.js"></script>
     <meta charset="utf-8">
-    <title>Bootstrap, from Twitter</title>
+    <title>SensApp</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -21,7 +21,7 @@
         padding: 9px 0;
       }
     </style>
-    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -30,7 +30,9 @@
   </head>
 
   <body>
+	
 
+	
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container-fluid">
@@ -42,9 +44,8 @@
           <a class="brand" href="#">SensApp</a>
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="active"><a href="bootstrapExample.html">Administration</a></li>
-              <li><a href="#Visualisation">Visualisation</a></li>
-              <li><a href="offlineUpload.html">Offline Upload</a></li>
+              <li class="active"><a href="index.html">Administration</a></li>
+              <li><a href="visualisation.html">Visualisation</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -52,10 +53,17 @@
     </div>
 
     <div class="container-fluid">
-
+	<ul class="nav nav-tabs">  
+		<li class="active">  
+		<a href="#">Sensors</a>   </li>     
+		<li><a href="compositeAdmin.html">Composite</a></li>  
+		<li><a href="notificationAdmin.html">Notification</a></li>  
+        <li><a href="offlineUpload.html">Offline Upload</a></li>		
+	</ul>  
+	
       <!-- Main hero unit for a primary marketing message or call to action -->
       <div>
-		 <a href="newSensor.html" class="btn btn-primary">Add Sensor</button></a>
+		 <a href="#add-Sensor" data-toggle="modal" class="btn btn-primary">Add Sensor</button></a>
       </div>
 
       <!-- Example row of columns -->
@@ -67,12 +75,11 @@
             <th>Description</th>  
             <th>Creation date</th>
             <th>Backend</th>  		
-            <th>Notifier</th>
 			<th>Actions</th>
           </tr>  
         </thead>  
-        <tbody id="data">  
-        </tbody>  
+		<tbody>
+		</tbody>
 </table>  
 </div>
       <hr>
@@ -80,18 +87,132 @@
       <footer>
       </footer>
 
-    </div> <!-- /container -->
+    </div>
+	
+	
+<!---------------------
+-Add Sensor Modal div--
+---------------------->	
+<div id="add-Sensor" class="modal hide fade in" style="display: none; ">  
+<div class="modal-header">  
+<a class="close" onClick="clearAddModal('add-Sensor')"  data-dismiss="modal">&times;</a>  
+<h2>New Sensor</h2>
+</div>  
+<div class="modal-body">  
+		<table id="add-form" style="font-size:14px;margin-left:5%;" cellpadding="5px">
+			<thead>
+			</thead>
+			<tbody id="form-body">
+			<tr id="id-row">
+				<td><b>Name* :</b></td> 
+				<td><input id="id" type="text" class="input-medium search-query" value=""></td>
+			</tr>
+			<tr id="descr-row">
+				<td><b>Description :</b></td> 
+				<td><input id="descr" type="text" class="input-medium search-query" value=""></td>
+			</tr>
+			<tr id="backend-row">
+				<td><b>Backend* :</b></td> 
+				<td>
+					<select id="backend" class="input-medium search-query" style="width:180px;">
+						<option>raw</option>
+						<option>RRDB</option>
+					</select>
+				</td>
+			</tr>
+			<tr id="template-row">
+				<td><b>Template* :</b></td> 
+				<td>
+					<select id="template" class="input-medium search-query" style="width:180px;">
+						<option>Numerical</option>
+						<option>String</option>
+					</select>
+				</td>
+			</tr>
+			<tr id="update_time-row">
+				<td><b>Update Time :</b></td>
+				<td><input id="update_time" type="text" class="input-medium search-query" value=""></td>
+			</tr>
+			<tr id="longitude-row">
+				<td><b>Longitude :</b></td>
+				<td><input id="longitude" type="text" class="input-medium search-query" value=""></td>
+			</tr>
+			<tr id="latitude-row">
+				<td><b>Latitude</b></td>
+				<td><input id="latitude" type="text" class="input-medium search-query" value=""></td>
+			</tr>
+			</tbody>
+		</table>
+		<i>* Mandatory</i>      
+</div> 
+<div class="modal-footer">
+<a href="#" class="btn" onclick="addEvent('add-Sensor','addTag','theValue');"><div class="icon-plus"></div>&nbsp;Custom Field</a>
+<a href="#" class="btn btn-primary" onClick="registerSensor(topology,'add-form','dataTable');" data-dismiss="modal">Register</a>  
+<a href="#" class="btn" onClick="clearAddModal('add-Sensor')" data-dismiss="modal">Close</a>  
+</div>  
+</div>  	
+
+
+<!---------------------
+-Edit Sensor Modal div-
+---------------------->	
+<div id="edit-Sensor" class="modal hide fade in" style="display: none; ">  
+<div class="modal-header">  
+<a class="close" onclick="clearEditModal('edit-Sensor')" data-dismiss="modal">&times;</a>  
+<h2 id="title"></h2>
+</div>  
+<div class="modal-body">  
+	<table id="form" style="font-size:14px;margin-left:5%;" cellpadding="5px">
+			<tr>
+				<td><b>Name :</b></td> 
+		  <td><input id="id" type="text" class="input-medium search-query" disabled></td>
+			</tr>
+			<tr>
+				<td><b>Description :</b></td> 
+				<td><input id= "descr" type="text" class="input-medium search-query"></td>
+			</tr>
+			<tr>
+				<td><b>Creation Date :</b></td> 
+				<td><input id="creation_date" type="text" class="input-medium search-query" disabled></td>
+			</tr>
+			<tr>
+				<td><b>Backend :</b></td> 
+				<td>
+					<input id="kind" type="text" class="input-medium search-query" disabled>
+				</td>
+			</tr>
+			<tr>
+				<td><b>Update Time :</b></td>
+				<td><input id="update_time" type="text" class="input-medium search-query"></td>
+			</tr>
+			<tr>
+				<td><b>Longitude :</b></td>
+				<td><input id="longitude" type="text" class="input-medium search-query"></td>
+			</tr>
+			<tr>
+				<td><b>Latitude :</b></td>
+				<td><input id="latitude" type="text" class="input-medium search-query"></td>
+			</tr>
+		</table>
+</div> 
+<div class="modal-footer">  
+<a href="#" class="btn" onclick="addEvent('edit-Sensor','editTag','theValue');"><div class="icon-plus"></div>&nbsp;Custom Field</a>
+<a href="#" class="btn btn-primary" onclick="updateSensor($('#edit-Sensor').find('#id').attr('value'),topology,'edit-Sensor','dataTable');" data-dismiss="modal">Update</a>  
+<a href="#" class="btn" onclick="clearEditModal('edit-Sensor')" data-dismiss="modal">Close</a>  
+</div>  
+</div>  	
+<input type="hidden" value="0" id="theValue" />
+
     <!-- Le javascript
     ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
 	<script type="text/javascript" src="./DataTables-1.9.1/media/js/jquery.dataTables.js"></script>
-    <script type="text/javascript" src="./javascripts/adminDisplay.js"></script>
-	<script type="text/javascript" src="./javascripts/admin.js"></script>
+    <script type="text/javascript" src="./javascripts/index.js"></script>
+	<script type="text/javascript" src="./javascripts/genericFunctions.js"></script>
 	<script type="text/javascript" src="./javascripts/topology.js"></script>
-	<script type="text/javascript" src="./javascripts/topology.js"></script>
+    <script src="./javascripts/optionalFields.js"></script>
 	<script type="text/javascript" charset="utf-8" language="javascript" src="bootstrap/js/DT_bootstrap.js"></script>
 	<script> var topology = getTopology();
-	getAllSensors(getURL(topology,"registry","/registry/sensors")+"?flatten=true",topology,"data");
+	getAllSensors(getURL(topology,"registry","/registry/sensors")+"?flatten=true",topology,"dataTable");
 	</script>
 
     <script src="bootstrap/js/bootstrap-transition.js"></script>

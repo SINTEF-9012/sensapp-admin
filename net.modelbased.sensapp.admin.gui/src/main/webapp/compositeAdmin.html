@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+<link rel="stylesheet" type="text/css" href="bootstrap/css/DT_bootstrap.css">
+
+<html lang="en">
+  <head>
+	<script src="http://code.jquery.com/jquery-latest.js"></script>
+    <meta charset="utf-8">
+    <title>SensApp</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Le styles -->
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+    </style>
+    <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+  </head>
+
+  <body>
+	<div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">SensApp</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="active"><a href="index.html">Administration</a></li>
+              <li><a href="visualisation.html">Visualisation</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+	<ul class="nav nav-tabs">  
+		<li>  
+		<a href="index.html">Sensors</a>   </li>     
+		<li class="active"><a href="compositeAdmin.html">Composite</a></li>  
+		<li><a href="notificationAdmin.html">Notification</a></li>
+        <li><a href="offlineUpload.html">Offline Upload</a></li>		
+	</ul>  
+	
+      <div>
+		 <a href="#add-Composite" data-toggle="modal" class="btn btn-primary">Add Composite Sensor</button></a>
+		 <a href="#add-Composite" class="btn btn-primary">Add Selected Sensors To :</button></a>
+		<select id="compositeList" class="input-medium search-query" style="width:180px;">
+		</select>
+      </div>
+
+	  
+<div id="tablesDiv" style="margin-top:10px">
+<div id="composite">
+<h2>Composite Sensors</h2>
+<table id="compositeTable" class="table table-striped table-bordered" cellpadding="0" cellspacing="0" border="0">  
+        <thead>  
+          <tr>  
+            <th>Name</th>
+            <th>Description</th>  
+			<th>Actions</th>
+          </tr>  
+        </thead> 
+		<tbody>
+		</tbody>
+</table>
+</div>
+<div id="contained" hidden>
+<h2>Contained Sensors</h2>
+<table id="containedSensorTable" class="table table-striped table-bordered" cellpadding="0" cellspacing="0" border="0">  
+        <thead>  
+          <tr>  
+            <th>Name</th>		
+			<th>Select</th>
+          </tr>  
+        </thead>
+		<tbody>
+		</tbody>
+</table>
+<a class="btn btn-danger">Delete Selected Items</a>
+<a class="btn" onclick="$('#tablesDiv').find('#contained').hide();$('#tablesDiv').find('#all').show();">Close</a>
+</div>
+<div id="all">
+<h2>Simple Sensors</h2>
+<table id="sensorTable" class="table table-striped table-bordered" cellpadding="0" cellspacing="0" border="0">  
+        <thead>  
+          <tr>  
+            <th>Name</th>
+            <th>Description</th>  
+            <th>Creation date</th>
+            <th>Backend</th>  		
+			<th>Actions</th>
+			<th>Select</th>
+          </tr>  
+        </thead>
+		<tbody>
+		</tbody>
+</table>  
+</div>
+<hr>
+<footer>
+</footer>
+</div>
+
+<!---------------------
+-Add Composite Modal div--
+---------------------->	
+<div id="add-Composite" class="modal hide fade in" style="display: none; ">  
+<div class="modal-header">  
+<a class="close" onClick="clearAddModal('add-Composite')"  data-dismiss="modal">&times;</a>  
+<h2>New Composite</h2>
+</div>  
+<div class="modal-body">  
+		<table id="add-form" style="font-size:14px;margin-left:5%;" cellpadding="5px">
+			<thead>
+			</thead>
+			<tbody id="form-body">
+			<tr id="id-row">
+				<td><b>Name* :</b></td> 
+				<td><input id="id" type="text" class="input-medium search-query" value=""></td>
+			</tr>
+			<tr id="descr-row">
+				<td><b>Description :</b></td> 
+				<td><input id="descr" type="text" class="input-medium search-query" value=""></td>
+			</tr>
+		</table>
+		<i>* Mandatory</i>      
+</div> 
+<div class="modal-footer">
+<a href="#" class="btn" onclick="addEvent('add-Composite','addTag','theValue');"><div class="icon-plus"></div>&nbsp;Custom Field</a>
+<a href="#" class="btn btn-primary" onClick="registerComposite(topology,'add-form','compositeList','compositeTable');" data-dismiss="modal">Register</a>  
+<a href="#" class="btn" onClick="clearAddModal('add-Composite')" data-dismiss="modal">Close</a>  
+</div>  
+</div> 
+<input type="hidden" value="0" id="theValue" />
+	<!-- /container -->
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+	<script type="text/javascript" src="./DataTables-1.9.1/media/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="./javascripts/genericFunctions.js"></script>
+	<script type="text/javascript" src="./javascripts/compositeAdmin.js"></script>
+	<script type="text/javascript" src="./javascripts/topology.js"></script>
+    <script src="./javascripts/optionalFields.js"></script>
+	<script> var topology = getTopology();
+	tableToJqueryDataTable('containedSensorTable');
+	getAllComposite(getURL(topology,"registry","/registry/composite/sensors")+"?flatten=true","compositeList","compositeTable");
+	getAllSensors (getURL(topology,"registry","/registry/sensors")+"?flatten=true","sensorTable");
+
+	</script>
+	<script type="text/javascript" charset="utf-8" language="javascript" src="bootstrap/js/DT_bootstrap.js"></script>
+    <script src="./javascripts/optionalFields.js"></script>
+    <script src="bootstrap/js/bootstrap-transition.js"></script>
+    <script src="bootstrap/js/bootstrap-alert.js"></script>
+    <script src="bootstrap/js/bootstrap-modal.js"></script>
+    <script src="bootstrap/js/bootstrap-dropdown.js"></script>
+    <script src="bootstrap/js/bootstrap-scrollspy.js"></script>
+    <script src="bootstrap/js/bootstrap-tab.js"></script>
+    <script src="bootstrap/js/bootstrap-tooltip.js"></script>
+    <script src="bootstrap/js/bootstrap-popover.js"></script>
+    <script src="bootstrap/js/bootstrap-button.js"></script>
+    <script src="bootstrap/js/bootstrap-collapse.js"></script>
+    <script src="bootstrap/js/bootstrap-carousel.js"></script>
+    <script src="bootstrap/js/bootstrap-typeahead.js"></script>
+	</body>
+</html>

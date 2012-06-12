@@ -1,10 +1,12 @@
 
 <!DOCTYPE html>
+<link rel="stylesheet" type="text/css" href="bootstrap/css/DT_bootstrap.css">
+
 <html lang="en">
   <head>
 	<script src="http://code.jquery.com/jquery-latest.js"></script>
     <meta charset="utf-8">
-    <title>Bootstrap, from Twitter</title>
+    <title>SensApp</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -19,17 +21,11 @@
         padding: 9px 0;
       }
     </style>
-    <link href="css/bootstrap-responsive.css" rel="stylesheet">
-
-    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
   </head>
 
   <body>
-
-    <div class="navbar navbar-fixed-top">
+	<div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container-fluid">
           <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -41,8 +37,7 @@
           <div class="nav-collapse">
             <ul class="nav">
               <li class="active"><a href="index.html">Administration</a></li>
-              <li><a href="#Visualisation">Visualisation</a></li>
-			  <li><a href="offlineUpload.html">Offline Upload</a></li>
+              <li><a href="visualisation.html">Visualisation</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -50,55 +45,88 @@
     </div>
 
     <div class="container-fluid">
-
-      <!-- Main hero unit for a primary marketing message or call to action -->
-      <div>
-		<form class="well form-search">  
-		  <button type="submit" class="btn">Search &raquo;</button>
-		  <input type="text" class="input-medium search-query">  
-		  &nbsp; &nbsp; &nbsp;<a class="btn btn-primary">Add Hook &raquo;</button></a>
-		  <input type="text" class="input-medium search-query" style="width:250px;">  
-      </div>
-
-      <!-- Example row of columns -->
-<table class="table table-striped">  
+	<ul class="nav nav-tabs">  
+		<li>  
+		<a href="index.html">Sensors</a>   </li>     
+		<li><a href="compositeAdmin.html">Composite</a></li>  
+		<li class="active"><a href="notificationAdmin.html">Notification</a></li>
+        <li><a href="offlineUpload.html">Offline Upload</a></li>		
+	</ul>  
+<div id="tablesDiv" style="margin-top:10px">
+<h2>Notifier Sensors</h2>
+<table id="notifierTable" class="table table-striped table-bordered" cellpadding="0" cellspacing="0" border="0">  
         <thead>  
           <tr>  
-            <th>Hook</th>
+            <th>Name</th>
+            <th>Description</th>  
+            <th>Creation date</th>
+            <th>Backend</th>  		
 			<th>Actions</th>
           </tr>  
-        </thead>  
-        <tbody>  
+        </thead> 
+		<tbody>
+		</tbody>
+</table>
+<h2>Other Sensors</h2>
+<table id="nonNotifierTable" class="table table-striped table-bordered" cellpadding="0" cellspacing="0" border="0">  
+        <thead>  
           <tr>  
-            <td>Hook1</td>
-            <td>
-            <a class="btn btn-danger">Delete</a>
-			</td>
+            <th>Name</th>
+            <th>Description</th>  
+            <th>Creation date</th>
+            <th>Backend</th>  		
+			<th>Actions</th>
           </tr>  
-          <tr>  
-            <td>Hook2</td>
-            <td>
-            <a class="btn btn-danger">Delete</a>
-			</td>	
-          </tr>  
-          <tr>  
-            <td>Hook3</td>  
-            <td>
-            <a class="btn btn-danger">Delete</a>
-			</td>
-          </tr>  
-        </tbody>  
-      </table>  
-      <hr>
+        </thead>
+		<tbody>
+		</tbody>
+</table>  
+</div>
+<hr>
 
-      <footer>
-      </footer>
+<footer>
+</footer>
 
-    </div> <!-- /container -->
+</div>
 
+<!---------------------
+-Hook Admin Modal div--
+---------------------->	
+<div id="hook-Modal" class="modal hide fade in" style="display: none; ">  
+<div class="modal-header">  
+<a class="close" data-dismiss="modal">&times;</a>  
+<h2>Hook List</h2>
+</div>  
+<div class="modal-body" style="font-size:14px;margin-left:5%;">  
+<table id="hook-List">
+<thead>
+<th>Hook</th>
+<th>Actions</th>
+</thead>
+<tbody>
+</tbody>
+</table>
+</div> 
+<div class="modal-footer">  
+<a href="#" class="btn btn-primary" onClick="" data-dismiss="modal">Register</a>  
+<a href="#" class="btn" data-dismiss="modal">Close</a>  
+</div>  
+</div> 
+	
+	<!-- /container -->
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
+	<script type="text/javascript" src="./DataTables-1.9.1/media/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="./javascripts/genericFunctions.js"></script>
+	<script type="text/javascript" src="./javascripts/notificationAdmin.js"></script>
+	<script type="text/javascript" src="./javascripts/topology.js"></script>
+    <script src="./javascripts/optionalFields.js"></script>
+	<script type="text/javascript" charset="utf-8" language="javascript" src="bootstrap/js/DT_bootstrap.js"></script>
+	<script> var topology = getTopology();
+	getNotificationInformations(getURL(topology,"registry","/registry/sensors")+"?flatten=true",topology,"notifierTable","nonNotifierTable");
+	</script>
+
     <script src="bootstrap/js/bootstrap-transition.js"></script>
     <script src="bootstrap/js/bootstrap-alert.js"></script>
     <script src="bootstrap/js/bootstrap-modal.js"></script>
@@ -111,5 +139,7 @@
     <script src="bootstrap/js/bootstrap-collapse.js"></script>
     <script src="bootstrap/js/bootstrap-carousel.js"></script>
     <script src="bootstrap/js/bootstrap-typeahead.js"></script>
-  </body>
+	<script>$(function() {$('#myVeryOwnSensor-Infos').popover();});</script>
+	<script>tableToJqueryDataTable('hook-List');</script>
+	</body>
 </html>

@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<link rel="stylesheet" type="text/css" href="bootstrap/css/DT_bootstrap.css">
+
+<html lang="en">
+  <head>
+	<script src="http://code.jquery.com/jquery-latest.js"></script>
+    <meta charset="utf-8">
+    <title>SensApp</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Le styles -->
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+    </style>
+    <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">SensApp</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="index.html">Administration</a></li>
+              <li class="active"><a href="visualisation.html">Visualisation</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+
+      <!-- Example row of columns -->
+<div style="margin-top:10px">
+<table id="sensorTable" class="table table-striped table-bordered" cellpadding="0" cellspacing="0" border="0" >  
+        <thead>  
+          <tr>  
+            <th>Name</th>
+            <th>Description</th>  
+            <th>Update Time</th>
+            <th id="tags">Tags</th>  		
+            <th>View</th>
+          </tr>  
+        </thead>
+        <tbody id="sensors">  
+        </tbody>  
+</table>  
+</div>
+      <hr>
+
+      <footer>
+      </footer>
+
+    </div>
+
+	<div id="data" class="container-fluid">
+	<table id="rawDataTable" class="table table-striped table-bordered" cellpadding="0" cellspacing="0" border="0" hidden>
+		<thead>
+			<th>Time</th>
+			<th>Value</th>
+		</thead>
+		<tbody></tbody>
+	</table>
+	<div id="rawTimeSerie">
+
+	</div>
+	</div>
+
+	<!-- /container -->
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+	<script type="text/javascript" src="./DataTables-1.9.1/media/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="./javascripts/visualisation.js"></script>
+	<script type="text/javascript" src="./javascripts/genericFunctions.js"></script>
+	<script type="text/javascript" src="./javascripts/topology.js"></script>
+	<script type="text/javascript" charset="utf-8" language="javascript" src="bootstrap/js/DT_bootstrap.js"></script>
+	<script> var topology = getTopology();
+	getAllSensorsForVisu(getURL(topology,"registry","/registry/sensors")+"?flatten=true","sensorTable");
+	</script>
+<script src="./highcharts/js/highcharts.js"></script>
+<script src="./highcharts/js/modules/exporting.js"></script>
+    <script src="bootstrap/js/bootstrap-transition.js"></script>
+    <script src="bootstrap/js/bootstrap-alert.js"></script>
+    <script src="bootstrap/js/bootstrap-modal.js"></script>
+    <script src="bootstrap/js/bootstrap-dropdown.js"></script>
+    <script src="bootstrap/js/bootstrap-scrollspy.js"></script>
+    <script src="bootstrap/js/bootstrap-tab.js"></script>
+    <script src="bootstrap/js/bootstrap-tooltip.js"></script>
+    <script src="bootstrap/js/bootstrap-popover.js"></script>
+    <script src="bootstrap/js/bootstrap-button.js"></script>
+    <script src="bootstrap/js/bootstrap-collapse.js"></script>
+    <script src="bootstrap/js/bootstrap-carousel.js"></script>
+    <script src="bootstrap/js/bootstrap-typeahead.js"></script>
+	
+<script type="text/javascript">
+
+
+   
+</script>
+ </body>
+</html>
