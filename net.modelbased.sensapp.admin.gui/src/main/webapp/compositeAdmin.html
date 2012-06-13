@@ -55,9 +55,6 @@
 	
       <div>
 		 <a href="#add-Composite" data-toggle="modal" class="btn btn-primary">Add Composite Sensor</button></a>
-		 <a href="#add-Composite" class="btn btn-primary">Add Selected Sensors To :</button></a>
-		<select id="compositeList" class="input-medium search-query" style="width:180px;">
-		</select>
       </div>
 
 	  
@@ -88,11 +85,16 @@
 		<tbody>
 		</tbody>
 </table>
-<a class="btn btn-danger">Delete Selected Items</a>
-<a class="btn" onclick="$('#tablesDiv').find('#contained').hide();$('#tablesDiv').find('#all').show();">Close</a>
+<a id="deleteButton" class="btn btn-danger">Delete Selected Items</a>
+<a class="btn" onclick="$('#tablesDiv').find('#contained').hide();$('#tablesDiv').find('#all').show();selectedList=new Array();">Close</a>
 </div>
 <div id="all">
 <h2>Simple Sensors</h2>
+<a href="#add-Composite" class="btn btn-primary" onclick="addSelectedSensors(getURL(topology,'registry','/registry/composite/sensors/'+$('#compositeList').val()),'all');">Add Selected Sensors To :</button></a>&nbsp;<select id="compositeList" class="input-medium search-query" style="width:180px;">
+		</select>
+		<p><div id="successAlert" class="alert alert-success hide fade in">  
+  Sensors are added to the composite  
+</div> </p>
 <table id="sensorTable" class="table table-striped table-bordered" cellpadding="0" cellspacing="0" border="0">  
         <thead>  
           <tr>  
@@ -154,6 +156,7 @@
 	<script type="text/javascript" src="./javascripts/topology.js"></script>
     <script src="./javascripts/optionalFields.js"></script>
 	<script> var topology = getTopology();
+	selectedList = new Array();
 	tableToJqueryDataTable('containedSensorTable');
 	getAllComposite(getURL(topology,"registry","/registry/composite/sensors")+"?flatten=true","compositeList","compositeTable");
 	getAllSensors (getURL(topology,"registry","/registry/sensors")+"?flatten=true","sensorTable");

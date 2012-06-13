@@ -26,6 +26,7 @@ function displayAllComposite(data,selectList,compositeTable) {
 		addRowToCompositeDatable(sensor,compositeTable);
 		fillSelect(sensor,selectList);
 	});
+	sortOptionList(selectList);
 }
 
 function fillSelect(sensor,selectList) {
@@ -34,6 +35,36 @@ function fillSelect(sensor,selectList) {
 			.attr("id",sensor.id)
 			.text(sensor.id)
 	);
+}
+
+function sortOptionList(selectId) {
+	// get the select
+	var $dd = $('#'+selectId);
+	if ($dd.length > 0) { // make sure we found the select we were looking for
+		// save the selected value
+		var selectedVal = $dd.val();
+		// get the options and loop through them
+		var $options = $('option', $dd);
+		var arrVals = [];
+		$options.each(function(){
+			// push each option value and text into an array
+			arrVals.push({
+				val: $(this).val(),
+				text: $(this).text()
+			});
+		});
+		// sort the array by the value (change val to text to sort by text instead)
+		arrVals.sort(function(a, b){
+			return a.text.toLowerCase().localeCompare(b.text.toLowerCase());
+		});
+		
+		// loop through the sorted array and set the text/values to the options
+		for (var i = 0, l = arrVals.length; i < l; i++) {
+			$($options[i]).val(arrVals[i].val).text(arrVals[i].text);
+		}
+		// set the selected value back
+		$dd.val(selectedVal);
+	}
 }
 
 function createCompositeActions(sensor) {
@@ -59,10 +90,10 @@ function createCompositeActions(sensor) {
 				.text("+ Infos")
 			)
 			.append(
-				//Remove Button
+				//View Button
 				$(document.createElement('a'))
 					.attr("class","btn")
-					.attr("href","#")
+					.attr("href","#contained")
 					.attr("onclick","createContainedTable(getURL(topology,'registry','/registry/composite/sensors/"+sensor.id+"'),'"+sensor.id+"','contained');$('#tablesDiv').find('#all').hide();")
 					.text("View Contained Sensors")
 			)
@@ -112,16 +143,14 @@ function removeListItem(sensorId,compositeList) {
 // Contained Table Functions
 //**********************************
 
-function createContainedTable (targetURL,sensorId,containedDiv) {
-
-
+function createContainedTable(targetURL,sensorId,containedDiv) {
 	$.ajax({
 		type: "get",
 		url: targetURL,
 		success: function (data,textStatus,jqXHR) {
 				containedTable = $('#'+containedDiv).find('table')[0];
 				$(containedTable).dataTable().fnClearTable();
-				/*containedTable.dataTable().fnDestroy();*/
+				selectedList = data.sensors;
 				if (data.length!=0) {
 					displayContainedSensors(data,containedTable.id);
 				}
@@ -132,36 +161,71 @@ function createContainedTable (targetURL,sensorId,containedDiv) {
 				alert(textStatus+":"+errorThrown);
 			}
 	});
-
+	
+	$('#'+containedDiv).find("#deleteButton").attr("onclick","deleteSelectedSensors('"+targetURL+"','contained');");
+	
 } 
 
-function displayContainedSensors(data,containedDiv) {
+function displayContainedSensors(data,containedTable) {
 
 	$.each(data.sensors, function (i,element) {
-		var split = element.split("/registry/composite/sensors/");
-		addRowToContainedDataTable(split[split.length-1],containedDiv);
+		var split = element.split("/registry/sensors/");
+		addRowToContainedDataTable(split[split.length-1],containedTable);
 	});
 }
 
-function addRowToContainedDataTable (element,containedDiv) {
-
-	containedDiv.find('table').dataTable().fnAddData([
+function addRowToContainedDataTable (element,containedTable) {
+	$('#'+containedTable).dataTable().fnAddData([
 		element,
-		createContainedSelection().html()]);
+		createContainedSelection(element).html()]);
 }
 
-function createContainedSelection() {
-
+function createContainedSelection(sensorId) {
 	return 	$(document.createElement('label'))
 				.attr("class","checkbox")
 				.append(
 						$(document.createElement('input'))
 						.attr("type","checkbox")
-						//.attr("onclick","putToComposite(getURL(topology,'registry','/registry/sensors/"+sensor.id+"'))")
+						.attr("id",sensorId+"-Checkbox")
+						.attr("onclick","deleteSensorFromList('"+sensorId+"','contained')")
 						.attr("class","checkbox")
-						
 				);
+}
 
+function deleteSensorFromList (sensorId,sensorDiv) {
+
+	if ($('#'+sensorDiv).find('#'+sensorId+"-Checkbox").is(':checked'))	{
+		  selectedList = jQuery.grep(selectedList, function(value) {
+		  return value != "/registry/sensors/"+sensorId;
+		});
+	}
+	else {
+		selectedList.push("/registry/sensors/"+sensorId);
+	}
+}
+
+function deleteSelectedSensors(targetURL,containedDiv) {
+
+	$.ajax({
+		type: "put",
+		url: targetURL,
+		contentType: "application/json",
+		data: JSON.stringify(selectedList),
+		success: function (data,textStatus,jqXHR) {
+			deleteSelectedRows(containedDiv);
+			selectedList = new Array();
+		},
+		error: 
+			function (jqXHR, textStatus, errorThrown) {
+				alert(textStatus+":"+errorThrown);
+			}
+	});
+}
+
+function deleteSelectedRows(containedDiv) {	
+	$.each($('#'+containedDiv).find('table').find(':checked'), function (i,element) {
+		removeRow($(element).closest('tr').get(0),$('#'+containedDiv).find('table').attr("id"));
+	});
 }
 
 //*********************************
@@ -205,9 +269,8 @@ function addRowToSensorDataTable(sensor,sensorDiv) {
 	
 	//write the jquery function associated to popovers
 	$('body').append(
-			$(document.createElement('script')).append("$(function() {$('#"+sensor.id+"-Infos').popover({placement:'top'});});")
+			$(document.createElement('script')).append("$(function() {$('#"+sensorDiv+"').find('#"+sensor.id+"-Infos').popover({placement:'top'});});")
 	);
-	
 }
 
 function createSensorActions(sensor) {
@@ -253,8 +316,63 @@ function createSensorSelect(sensor) {
 		.append(
 			$(document.createElement('input'))
 				.attr("type","checkbox")
-				.attr("class","checkbox")				
+				.attr("class","checkbox")
+				.attr("id",sensor.id+"-Checkbox")
+				.attr("onclick","addSensorToList('"+sensor.id+"','all')")
 		);
+}
+
+function addSelectedSensors(targetURL,sensorDiv) {
+	$.ajax({
+		type: "get",
+		url: targetURL,
+		success: function (data,textStatus,jqXHR) {
+			selectedList = $.merge(selectedList,data.sensors);
+			selectedList.sort();
+			for(var i=1;i<selectedList.length;i++) {
+				if(selectedList[i-1]==selectedList[i]) {
+					selectedList.splice(i,1);
+				}
+			}
+			putSelectedSensors(targetURL,sensorDiv);
+		},
+		error: 
+			function (jqXHR, textStatus, errorThrown) {
+				alert(textStatus+":"+errorThrown);
+			}
+	});	
+}
+
+function putSelectedSensors(targetURL,sensorDiv) {
+
+	$.ajax({
+		type: "put",
+		url: targetURL,
+		contentType: "application/json",
+		data: JSON.stringify(selectedList),
+		success: function (data,textStatus,jqXHR) {
+			selectedList = new Array();
+			$('#'+sensorDiv).find('table').find(':checked').attr('checked',false);
+			$('#'+sensorDiv).find('#successAlert').show();
+			window.setTimeout(function() { $('#'+sensorDiv).find('#successAlert').hide(); }, 4000);
+		},
+		error: 
+			function (jqXHR, textStatus, errorThrown) {
+				alert(textStatus+":"+errorThrown);
+			}
+	});
+}
+
+function addSensorToList (sensorId,sensorDiv) {
+
+	if ($('#'+sensorDiv).find('#'+sensorId+"-Checkbox").is(':checked'))	{
+		selectedList.push("/registry/sensors/"+sensorId);
+	}
+	else {
+		  selectedList = jQuery.grep(selectedList, function(value) {
+		  return value != "/registry/sensors/"+sensorId;
+		});
+	}
 }
 
 //*********************************
@@ -277,7 +395,7 @@ function postComposite(targetURL,postData,selectList,compositeTable) {
 		success: function (data,textStatus,jqXHR) {
 			addRowToCompositeDatable(postData,compositeTable);
 			fillSelect(postData,selectList);
-
+			sortOptionList(selectList);
 		},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {

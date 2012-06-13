@@ -38,7 +38,7 @@ function addRowToSensorDataTable(sensor,sensorDiv) {
 	
 	//write the jquery function associated to popovers
 	$('body').append(
-			$(document.createElement('script')).append("$(function() {$('#"+sensor.id+"-Infos').popover({placement:'top'});});")
+			$(document.createElement('script')).append("$(function() {$('#"+sensorDiv+"').find('#"+sensor.id+"-Infos').popover({placement:'top'});});")
 	);
 	
 }
@@ -200,13 +200,41 @@ function updateSensorMetaData (targetURL,putData,tableDiv) {
 		data: JSON.stringify(putData),
 		success: 
 			function (data, textStatus, jqXHR) {
-				//TODO rewriteMoreInfo(data,tableDiv);
+				rewriteMetaData(data,tableDiv);
 				clearEditModal('edit-Sensor');
 			},
 		error: function (jqXHR, textStatus, errorThrown) {
 				alert(textStatus+":"+errorThrown);
 			}
 	});
+}
+
+function rewriteMetaData(data,tableDiv) {
+
+	colId = $('#'+tableDiv).find("th:contains('Actions')").index();
+	rowId = $('#'+tableDiv).find("tr").has("td:contains('"+data.id+"')").index();
+
+	var popoverContent = "";
+	if(data.infos.update_time!=null) {
+		popoverContent = popoverContent + "<li>Update time : " + data.infos.update_time + "</li>";
+	}
+
+	if(data.infos.loc!=null) {
+		if(data.infos.loc.longitude!=null) {
+			popoverContent = popoverContent + "<li>Longitude Loc : " + data.infos.loc.longitude + "</li>";
+		}
+		if(data.infos.loc.latitude!=null) {
+			popoverContent = popoverContent + "<li>Latitude Loc : " + data.infos.loc.latitude + "</li>";
+		}
+	}
+	if(data.infos.tags!=null) {
+		$.each(data.infos.tags, function(i,element) {
+			popoverContent = popoverContent + "<li>"+i+" : " + element + "</li>";
+		});
+	}	
+	//alert(popoverContent);
+	$('#'+tableDiv).find("tbody").find("tr").eq(rowId).find("td").eq(colId).find("#"+data.id+"-Infos").attr("data-content",popoverContent);
+
 }
 
 function updateSensorDescr (targetURL,putData,tableDiv) {		 
@@ -219,12 +247,21 @@ function updateSensorDescr (targetURL,putData,tableDiv) {
 		data: JSON.stringify(putData),
 		success: 
 			function (data, textStatus, jqXHR) {
-				//TODO rewriteDescr(data,tableDiv);
+				rewriteDescr(data,tableDiv);
 			},
 		error: function (jqXHR, textStatus, errorThrown) {
 				alert(textStatus+":"+errorThrown);
 			}
 	});
+}
+ 
+function rewriteDescr(data,tableDiv) {
+
+	colId = $('#'+tableDiv).find("th:contains('Description')").index();
+	rowId = $('#'+tableDiv).find("tr").has("td:contains('"+data.id+"')").index();
+
+	$('#'+tableDiv).find("tbody").find("tr").eq(rowId).find("td").eq(colId).text(data.descr);
+
 }
  
  function fillInputValues(data,div) {
