@@ -10,96 +10,51 @@ function getAllSensors (targetURL,topology,div) {
 		dataType:'json',
 		success: 
 			function (data, textStatus, jqXHR) {
-				tableToJqueryDataTable (div);
 				if (data.length!=0) {
 					displayAllSensors(data,div);
 				}
 			},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
-				alert(textStatus+":"+errorThrown);
+				alertMessage("error",errorThrown,5000);
 			}
 	});
 }
 
-function displayAllSensors(data,div) {
-	$.each(data, function(i,element) {
+function displayAllSensors(data,table) {
+	/*$.each(data, function(i,element) {
 		addRowToSensorDataTable(element,div);
+	});*/
+	
+	var sensorArray = new Array();
+	var sensorColumns = [{"sTitle":"Name"},{"sTitle":"Description"},{"sTitle":"Creation Date"},{"sTitle":"Actions"}];
+	
+	$.each(data,function (i,sensor) {
+
+		sensorArray.push([createNameColumn(sensor.id,"sensor").html(),
+						  createDescriptionColumn(sensor,"sensor").html(),
+						  timeStampToDate(sensor.creation_date),
+						  createSensorActions(sensor).html()]);
 	});
+	tableToJqueryDataTable (sensorArray,sensorColumns,table);
+//	var sensorDisplay = { "aaData": sensorArray,	"aoColumn": sensorColumns};
+//	$('#'+table).dataTable(sensorDisplay).$("div[rel=popover]").popover({placement:'right'});
+
 }
 
 function addRowToSensorDataTable(sensor,sensorDiv) {
 	$('#'+sensorDiv).dataTable().fnAddData( [
-		sensor.id,
-		sensor.descr,
+		createNameColumn(sensor.id,"sensor").html(),
+		createDescriptionColumn(sensor,"sensor").html(),
 		timeStampToDate(sensor.creation_date),
-		sensor.backend.kind,
 		createSensorActions(sensor).html()] );
-	
-	//write the jquery function associated to popovers
-	$('body').append(
-			$(document.createElement('script')).append("$(function() {$('#"+sensorDiv+"').find('#"+sensor.id+"-Infos').popover({placement:'top'});});")
-	);
-	
 }
-	
-function addNewSensorRowToSensorDataTable(sensor,sensorDiv) {
-	$('#'+sensorDiv).dataTable().fnAddData( [
-		sensor.id,
-		sensor.descr,
-		timeStampToDate(sensor.creation_date),
-		sensor.schema.backend,
-		createSensorActions(sensor).html()] );
-	}	
 
-function deleteSensor(targetURL,row,table) {
-	$.ajax({
-		type: "delete",
-		url: targetURL,
-		success: 
-			function (data, textStatus, jqXHR) {
-				removeRow(row,table);
-			},
-		error: 
-			function (jqXHR, textStatus, errorThrown) {
-				alert(textStatus+":"+errorThrown);
-			}
-	});
-}
+
 
 function createSensorActions(sensor) {
 
-	var popoverContent = "";
-	if(sensor.infos.update_time!=null) {
-		popoverContent = popoverContent + "<li>Update time : " + sensor.infos.update_time + "</li>";
-	}
-
-	if(sensor.infos.loc!=null) {
-		if(sensor.infos.loc.longitude!=null) {
-			popoverContent = popoverContent + "<li>Longitude Loc : " + sensor.infos.loc.longitude + "</li>";
-		}
-		if(sensor.infos.loc.latitude!=null) {
-			popoverContent = popoverContent + "<li>Latitude Loc : " + sensor.infos.loc.latitude + "</li>";
-		}
-	}
-	if(sensor.infos.tags!=null) {
-		$.each(sensor.infos.tags, function(i,element) {
-			popoverContent = popoverContent + "<li>"+i+" : " + element + "</li>";
-		});
-	}
-
 	return $(document.createElement('td'))
-		.append(	
-			//More Infos Button
-			$(document.createElement('a'))
-				.attr("class","btn")
-				.attr("id",sensor.id+"-Infos")
-				.attr("href","#")
-				.attr("rel","popover")
-				.attr("data-content",popoverContent)
-				.attr("data-original-title","Additional Infos")
-				.text("+ Infos")
-		)
 		.append(
 			//Edit Button
 			$(document.createElement('a'))
@@ -112,8 +67,9 @@ function createSensorActions(sensor) {
 		.append(
 			//Delete Button
 			$(document.createElement('a'))
-				.attr("href","#edit-Sensor")
-				.attr("onclick","deleteSensor(getURL(topology,'registry','/registry/sensors/"+sensor.id+"'),this.parentNode.parentNode,'dataTable');")
+				.attr("href","#delete-Sensor")
+				.attr("data-toggle","modal")
+				.attr("onclick","getDeleteInfos('"+sensor.id+"',this.parentNode.parentNode,'delete-Sensor','dataTable')")
 				.attr("class","btn btn-danger")
 				.text("Delete")
 		);
@@ -141,7 +97,7 @@ function postSensor(targetURL,postData,formDiv,tableDiv) {
 		},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
-				alert(textStatus+":"+errorThrown);
+				alertMessage("error",errorThrown,5000);
 			}
 	});
 }
@@ -158,9 +114,10 @@ function putSensorMetaData (targetURL,putData,sensorDiv,formDiv) {
 			function (data, textStatus, jqXHR) {
 				addRowToSensorDataTable(data,sensorDiv);
 				clearAddModal(formDiv);
+				alertMessage("success",data.id +" successfully added",5000);
 			},
 		error: function (jqXHR, textStatus, errorThrown) {
-				alert(textStatus+":"+errorThrown);
+				alertMessage("error",errorThrown,5000);
 			}
 	});
 }
@@ -185,7 +142,7 @@ function getMoreInputInfos(targetURL,div) {
 			},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
-				alert(textStatus+":"+errorThrown);
+				alertMessage("error",errorThrown,5000);
 			}
 	});	
 }
@@ -202,9 +159,10 @@ function updateSensorMetaData (targetURL,putData,tableDiv) {
 			function (data, textStatus, jqXHR) {
 				rewriteMetaData(data,tableDiv);
 				clearEditModal('edit-Sensor');
+				alertMessage("success","Information Updated",5000);
 			},
 		error: function (jqXHR, textStatus, errorThrown) {
-				alert(textStatus+":"+errorThrown);
+				alertMessage("error",errorThrown,5000);
 			}
 	});
 }
@@ -232,9 +190,8 @@ function rewriteMetaData(data,tableDiv) {
 			popoverContent = popoverContent + "<li>"+i+" : " + element + "</li>";
 		});
 	}	
-	//alert(popoverContent);
-	$('#'+tableDiv).find("tbody").find("tr").eq(rowId).find("td").eq(colId).find("#"+data.id+"-Infos").attr("data-content",popoverContent);
 
+	$('#'+tableDiv).find("tbody").find("tr").eq(rowId).find("td").eq(colId).find("#"+data.id+"-Infos").attr("data-content",popoverContent);
 }
 
 function updateSensorDescr (targetURL,putData,tableDiv) {		 
@@ -250,7 +207,7 @@ function updateSensorDescr (targetURL,putData,tableDiv) {
 				rewriteDescr(data,tableDiv);
 			},
 		error: function (jqXHR, textStatus, errorThrown) {
-				alert(textStatus+":"+errorThrown);
+				alertMessage("error",errorThrown,5000);
 			}
 	});
 }
@@ -324,6 +281,34 @@ function updateSensor(id,topology,formDiv,tableDiv) {
 	updateSensorMetaData(getURL(topology,"registry","/registry/sensors/"+id),putData,tableDiv);
 	var descr = getJSONDescr(formDiv);
 	updateSensorDescr(getURL(topology,"registry","/registry/sensors/"+id),descr,tableDiv);
+}
+
+//*********************************
+// Delete Modal Functions
+//**********************************
+
+function getDeleteInfos(sensorId,row,modalDiv,table) {
+	$('#'+modalDiv).find('h2').text("Delete " + sensorId + " ?");
+	$('#'+modalDiv).find('#delete').unbind('click').click( function () {
+		deleteSensor(getURL(topology,'registry','/registry/sensors/'+sensorId),row,table);
+	});
+}
+
+function deleteSensor(targetURL,row,table) {
+
+	$.ajax({
+		type: "delete",
+		url: targetURL,
+		success: 
+			function (data, textStatus, jqXHR) {
+				removeRow(row,table);
+				alertMessage("success","Sensor deleted",5000);
+			},
+		error: 
+			function (jqXHR, textStatus, errorThrown) {
+				alertMessage("error",errorThrown,5000);
+			}
+	});
 }
 
 //*********************************

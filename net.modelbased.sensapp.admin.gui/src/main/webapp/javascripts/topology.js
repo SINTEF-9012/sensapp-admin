@@ -38,5 +38,8 @@ function getURL(topology,partner,path) {
 	var node = item[0].node;
 	item = getObjects(topology["nodes"],"name",node);
 	
-	return "http://"+item[0].srv+":"+item[0].port+path;
+	if(item[0].srv!="" && item[0].port!="")
+		return "http://"+item[0].srv+":"+item[0].port+path;
+	else
+		return path;		
 }

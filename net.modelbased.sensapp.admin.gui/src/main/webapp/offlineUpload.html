@@ -18,8 +18,10 @@
       .sidebar-nav {
         padding: 9px 0;
       }
+	
     </style>
-    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+	
+    <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -29,7 +31,8 @@
 
   <body>
 
-    <div class="navbar navbar-fixed-top">
+    <div class="navbar-fixed-top">
+	<div class="navbar">
       <div class="navbar-inner">
         <div class="container-fluid">
           <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -40,39 +43,59 @@
           <a class="brand" href="#">SensApp</a>
           <div class="nav-collapse">
             <ul class="nav">
-              <li><a href="index.html">Administration</a></li>
-              <li><a href="visualisation.html">Visualisation</a></li>
+              <li id="admin" class="active dropdown">
+				<a class="dropdown-toggle" data-toggle="dropdown" href="#admin">Administration<b class="caret"></b></a>
+				<ul class="dropdown-menu">
+					<li class="active"><a href="index.html">Sensors</a></li>     
+					<li><a href="compositeAdmin.html">Composites</a></li>  
+					<li><a href="notificationAdmin.html">Notifications</a></li>  
+					<li><a href="#">Offline Upload</a></li>		
+				</ul>  
+			  </li>
+			  <li id="visu" class="dropdown">
+			  <a class="dropdown-toggle" data-toggle="dropdown" href="#visu">Visualisation<b class="caret"></b></a>
+			  	<ul class="dropdown-menu">
+					<li><a href="visualisation.html">Sensors</a></li>     
+					<li><a href="#">Composites</a></li> 
+					<li><a href="#">Dashboard</a></li>  
+				</ul>  
+			  </li>
             </ul>
+			<ul class="nav pull-right">
+				<li class="divider-vertical"></li>
+				<li><a href="offlineUpload.html">Refresh page</a></li>
+			</ul>
           </div><!--/.nav-collapse -->
         </div>
+		</div>
       </div>
-    </div>
-
-   <div class="container-fluid">
-	<ul class="nav nav-tabs">  
-		<li>  
-		<a href="index.html">Sensors</a>   </li>     
-		<li><a href="compositeAdmin.html">Composite</a></li>  
-		<li><a href="notificationAdmin.html">Notification</a></li>  
-        <li class="active"><a href="offlineUpload.html">Offline Upload</a></li>		
-	</ul>  
 	</div>
-	
-    <div class="container hero-unit">
-		<h2>Offline Upload</h2><br>
-		<table style="font-size:14px;margin-left:5%;" cellpadding="5px">
-			<tr>
-				<td><input type="file" class="input-file" style="width:360px"></td>
-			</tr>
-		</table>
-		<br>
-		<a class="btn">Upload</a>
-    </div>
-
+	<div class="span4 offset4" id="alert-div" style="position:fixed;width:40%;margin-top:10px;">
+	</div>	
+    <div id="loadDiv" class="container hero-unit">
+		<div class="row-fluid">
+			<h2>Offline Upload</h2><br>
+			<div class="span4">
+				<input type="file" class="input-file" style="width:360px">
+			</div>
+			<div class="span4 offset4">
+				<div class=" progress progress-striped active" hidden>
+					<div id="progressBar" class="bar" style="width: 0%;"></div>
+				</div>
+			</div>
+		</div>
+		<div class="span4">
+		<a class="btn" onclick="loadFile(getURL(topology,'database.raw','/databases/raw/load'),'loadDiv');">Load</a>
+		</div>
+	</div>
 	
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/javascript" src="./javascripts/genericFunctions.js"></script>
+	<script type="text/javascript" src="./javascripts/offlineUpload.js"></script>
+	<script type="text/javascript" src="./javascripts/topology.js"></script>
+	<script> var topology = getTopology(); </script>
     <script src="bootstrap/js/bootstrap-transition.js"></script>
     <script src="bootstrap/js/bootstrap-alert.js"></script>
     <script src="bootstrap/js/bootstrap-modal.js"></script>

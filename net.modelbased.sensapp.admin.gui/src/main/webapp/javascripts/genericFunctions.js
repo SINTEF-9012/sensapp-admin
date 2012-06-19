@@ -1,7 +1,118 @@
 function timeStampToDate (timestamp) {
 	var time = new Date(timestamp * 1000);
-	var timeString = time.getUTCDate()+"-"+(time.getUTCMonth()+1)+"-"+time.getFullYear()+" "+time.getHours()+":"+time.getMinutes()+":"+time.getSeconds();
-	return timeString;
+
+   var yyyy = time.getFullYear().toString();
+   var mm = (time.getUTCMonth()+1).toString(); // getMonth() is zero-based
+   var dd  = time.getUTCDate().toString();
+   
+	var hh = time.getHours().toString();
+ 	var min = time.getMinutes().toString();
+	var ss = time.getSeconds().toString();	
+	
+   return yyyy +"-"+(mm[1]?mm:"0"+mm[0]) +"-"+(dd[1]?dd:"0"+dd[0]) + " " + (hh[1]?hh:"0"+hh[0]) + ":" + (min[1]?min:"0"+min[0]) +":" + (ss[1]?ss:"0"+ss[0]);
+
+}
+
+function createNameColumn(sensorId,type) {
+	return $(document.createElement('div'))
+			.append(
+				$(document.createElement('a'))
+					.attr("rel","tooltip")
+					.attr("title","View raw data")
+					.attr("href","raw.html?sensor="+sensorId+"&type="+type)
+					.attr("target","_blank")
+					.text(sensorId)
+			);
+}
+
+function createDescriptionColumn(sensor,type) {
+
+	var div = $(document.createElement('div'))
+					.attr("rel","popover")
+
+					.attr("data-original-title","Additional Infos");
+	
+	if(sensor.descr!="")
+		div.text(sensor.descr);
+	else
+		div.text("n.a.");
+
+	switch (type) {
+		case "sensor": 
+			div.attr("data-content",getPopoverContent(sensor));
+			break;
+		case "composite":
+			div.attr("data-content",getCompositePopoverContent(sensor));
+			break;
+		case "notifier":
+			div.attr("data-content",getPopoverContent(sensor));
+			break;			
+		default:
+			break;
+	}
+	return $(document.createElement('div')).append(div);
+}
+
+function alertMessage(type,message,timeout) {
+	alertDiv = $(document.createElement('div'))
+		.text(message)
+		.append(
+			$(document.createElement('a'))
+				.attr("class","close")
+				.attr("data-dismiss","alert")
+				.text("Close")
+		);
+			
+	switch (type) {
+		case "success":
+			alertDiv.attr("class","alert alert-success fade in");
+			break;
+		case "error":
+			alertDiv.attr("class","alert alert-error fade in");
+			break;
+		case "warning":
+			alertDiv.attr("class","alert fade in");
+			break;
+		default:
+			break;
+	}
+	$('#alert-div').append(alertDiv);
+	if(typeof timeout!='undefined')
+		window.setTimeout(function() { $('#alert-div').find(':contains('+message+')').remove(); }, timeout);
+}
+
+function getPopoverContent(sensor) {
+	var popoverContent = "";
+	if(sensor.infos.update_time!=null) {
+		popoverContent = popoverContent + "<li>Update time : " + sensor.infos.update_time + "</li>";
+	}
+
+	if(sensor.infos.loc!=null) {
+		if(sensor.infos.loc.longitude!=null) {
+			popoverContent = popoverContent + "<li>Longitude Loc : " + sensor.infos.loc.longitude + "</li>";
+		}
+		if(sensor.infos.loc.latitude!=null) {
+				popoverContent = popoverContent + "<li>Latitude Loc : " + sensor.infos.loc.latitude + "</li>";
+		}
+	}
+	if(sensor.infos.tags!=null) {
+		$.each(sensor.infos.tags, function(i,element) {
+			popoverContent = popoverContent + "<li>"+i+" : " + element + "</li>";
+		});
+	}
+	return popoverContent;
+}
+
+function getCompositePopoverContent(sensor) {
+
+	var popoverContent = "";
+
+	if(sensor.tags!=null) {
+		$.each(sensor.tags, function(i,element) {
+			popoverContent = popoverContent + "<li>"+i+" : " + element + "</li>";
+		});
+	}
+	return popoverContent;
 }
 
 function removeRow(row,dataTable) {
@@ -13,7 +124,7 @@ function removeRow(row,dataTable) {
 	$('#'+table).dataTable().fnAdjustColumnSizing();
 }
 
-function tableToJqueryDataTable (div) {
+function tableToJqueryDataTable (data,columns,div) {
 			/* Default class modification */
 			$.extend( $.fn.dataTableExt.oStdClasses, {
 				"sSortAsc": "header headerSortDown",
@@ -112,14 +223,16 @@ function tableToJqueryDataTable (div) {
 				}
 			} );
 				
-	$(document).ready(function() {
 	
+				
+	$(document).ready(function() {
 		$("#"+div).dataTable({
-			"sDom": "<'row'<'span8'l><'span8'f>r>t<'row'<'span8'i><'span8'p>>",
+			"aaData": data,	
+			"aoColumn": columns,
 			"sPaginationType": "bootstrap",
 			"oLanguage": {
-			"sLengthMenu": "_MENU_ records per page"
+			"sLengthMenu": "_MENU_ records per page" 
 			}
-		});
+		}).$("div[rel=popover]").popover({placement:'right'});
 	});
 }

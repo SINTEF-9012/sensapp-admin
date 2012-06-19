@@ -15,12 +15,12 @@ function getNotificationInformations(targetURL,topology,notifierDiv,nonNotifierD
 			},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
-				alert(textStatus+":"+errorThrown);
+				alertMessage("error",errorThrown,5000);
 			}
 	});
 }
 
-function separateNotifiers(allSensors,targetURL,notifierDiv,nonNotifierDiv) {
+function separateNotifiers(allSensors,targetURL,notifierTable,nonNotifierTable) {
 
 	$.ajax({
 		type: "get",
@@ -29,22 +29,35 @@ function separateNotifiers(allSensors,targetURL,notifierDiv,nonNotifierDiv) {
 		dataType:'json',
 		success: 
 			function (notifierSensors, textStatus, jqXHR) {
-				tableToJqueryDataTable (notifierDiv);
-				tableToJqueryDataTable (nonNotifierDiv);
+				var notifiersArray = new Array();
+				var nonNotifiersArray = new Array();
+				var notifiersColumns = [{"sTitle":"Name"},{"sTitle":"Description"},{"sTitle":"Creation Date"},{"sTitle":"Actions"}];
+				var nonNotifiersColumms = [{"sTitle":"Name"},{"sTitle":"Description"},{"sTitle":"Creation Date"},{"sTitle":"Actions"}];
+				
 				$.each(allSensors, function (i,sensor) {
 					if(notifierSensors.indexOf("/notification/registered/"+sensor.id) != -1) {
-						addRowToNotifierDatable(sensor,notifierDiv);
+						notifiersArray.push([createNameColumn(sensor.id,"notifier").html(),
+											 createDescriptionColumn(sensor,"notifier").html(),
+											 timeStampToDate(
+											 sensor.creation_date),
+											 createNotifierActions(sensor,notifierTable,nonNotifierTable).html()]);
 					}
 					else {
-						addRowToNonNotifierDatable(sensor,nonNotifierDiv);
+						nonNotifiersArray.push([createNameColumn(sensor.id,"sensor").html(),
+												createDescriptionColumn(sensor,"sensor").html(),
+												timeStampToDate(sensor.creation_date),
+												createNonNotifierActions(sensor).html()]);
 					}
 				});
-				resizeDatatable(notifierDiv);
-				resizeDatatable(nonNotifierDiv);
+				var notifiersDisplay = { "aaData": notifiersArray, "aoColumn": notifiersColumns};
+				var nonNotifiersDisplay = { "aaData": nonNotifiersArray, "aoColumn": nonNotifiersColumms};
+				
+				$('#'+notifierTable).dataTable(notifiersDisplay).$("div[rel=popover]").popover({placement:'right'});
+				$('#'+nonNotifierTable).dataTable(nonNotifiersDisplay).$("div[rel=popover]").popover({placement:'right'});
 			},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
-				alert(textStatus+":"+errorThrown);
+				alertMessage("error",errorThrown,5000);
 			}
 	});	
 
@@ -71,7 +84,7 @@ function postNotifier(targetURL,postData,row,notifierTable,nonNotifierTable,topo
 		},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
-				alert(textStatus+":"+errorThrown);
+				alertMessage("error",errorThrown,5000);
 			}
 	});
 }
@@ -87,12 +100,11 @@ function addToNonNotifierTableById(targetURL,row,notifierTable,nonNotifierTable)
 			function (sensor, textStatus, jqXHR) {
 				addRowToNonNotifierDatable(sensor,nonNotifierTable);
 				removeRow(row,notifierTable);
-				resizeDatatable(notifierTable);
-				resizeDatatable(nonNotifierTable);	
+				alertMessage("success","Notifier removed",5000);
 			},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
-				alert(textStatus+":"+errorThrown);
+				alertMessage("error",errorThrown,5000);
 			}
 	});
  
@@ -110,12 +122,11 @@ function createNonNotifierActions(sensor) {
 		);	
 }
  
-function addRowToNonNotifierDatable(sensor,notifierDiv) {
-	$('#'+notifierDiv).dataTable().fnAddData( [
-		sensor.id,
-		sensor.descr,
+function addRowToNonNotifierDatable(sensor,nonNotifierTable) {
+	$('#'+nonNotifierTable).dataTable().fnAddData( [
+		createNameColumn(sensor.id,"sensor").html(),
+		createDescriptionColumn(sensor,"sensor").html(),
 		timeStampToDate(sensor.creation_date),
-		sensor.backend.kind,
 		createNonNotifierActions(sensor).html()] );
 }
 
@@ -123,17 +134,17 @@ function addRowToNonNotifierDatable(sensor,notifierDiv) {
 // Notifier Table Functions
 //**********************************
 
-function deleteNotifier(targetURL,sensor,row,notifierTable,nonNotifierTable,topology) {
+function deleteNotifier(targetURL,sensorId,row,notifierTable,nonNotifierTable) {
 	$.ajax({
 		type: "delete",
 		url: targetURL,
 		success: 
 			function (data, textStatus, jqXHR) {
-				addToNonNotifierTableById(getURL(topology,"registry","/registry/sensors/"+sensor),row,notifierTable,nonNotifierTable);
+				addToNonNotifierTableById(getURL(topology,"registry","/registry/sensors/"+sensorId),row,notifierTable,nonNotifierTable);
 			},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
-				alert(textStatus+":"+errorThrown);
+				alertMessage("error",errorThrown,5000);
 			}
 	});
 }
@@ -147,28 +158,26 @@ function addToNotifierTableById(targetURL,row,notifierTable,nonNotifierTable) {
 		dataType:'json',
 		success: 
 			function (sensor, textStatus, jqXHR) {
-				addRowToNotifierDatable(sensor,notifierTable);
+				addRowToNotifierDatable(sensor,notifierTable,nonNotifierTable);
 				removeRow(row,nonNotifierTable);
-				resizeDatatable(notifierTable);
-				resizeDatatable(nonNotifierTable);				
+				alertMessage("success",sensor.id +" registered as notifier",5000);				
 			},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
-				alert(textStatus+":"+errorThrown);
+				alertMessage("error",errorThrown,5000);
 			}
 	});
  }
  
-function addRowToNotifierDatable(sensor,notifierTable) {
+function addRowToNotifierDatable(sensor,notifierTable,nonNotifierTable) {
 	$('#'+notifierTable).dataTable().fnAddData( [
-		sensor.id,
-		sensor.descr,
+		createNameColumn(sensor.id,"notifier").html(),
+		createDescriptionColumn(sensor,"notifier").html(),
 		timeStampToDate(sensor.creation_date),
-		sensor.backend.kind,
-		createNotifierActions(sensor).html()] );
+		createNotifierActions(sensor,notifierTable,nonNotifierTable).html()] );
 }
  
-function createNotifierActions(sensor) {
+function createNotifierActions(sensor,notifierTable,nonNotifierTable) {
 	return $(document.createElement('td'))
 		.append(	
 			//View Hooks Button
@@ -183,12 +192,21 @@ function createNotifierActions(sensor) {
 		.append(
 			//Remove As Notifier Button
 			$(document.createElement('a'))
-				.attr("href","#")
-				.attr("onclick","deleteNotifier(getURL(topology,'notifier','/notification/registered/"+sensor.id+"'),'"+sensor.id+"',this.parentNode.parentNode,'notifierTable','nonNotifierTable',topology);")
+				.attr("href","#delete-Sensor")
+				.attr("data-toggle","modal")
+				.attr("onclick","getDeleteInfos('"+sensor.id+"',this.parentNode.parentNode,'delete-Sensor','"+notifierTable+"','"+nonNotifierTable+"');")
 				.attr("class","btn btn-danger")
 				.text("Remove As Notifier")
 		);	
 }
+
+function getDeleteInfos (sensorId,row,modalDiv,notifierTable,nonNotifierTable) {
+	$('#'+modalDiv).find('h2').text("Delete " + sensorId + " ?");
+	$('#'+modalDiv).find('#delete').unbind('click').click( function () {
+			deleteNotifier(getURL(topology,'notifier','/notification/registered/'+sensorId),sensorId,row,notifierTable,nonNotifierTable);
+	});
+}
+
 
 //*********************************
 // Hooks Admin Functions
@@ -206,7 +224,7 @@ function getHookList(targetURL,hookTable) {
 			},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
-				alert(textStatus+":"+errorThrown);
+				alertMessage("error",errorThrown,5000);
 			}
 	});
 }

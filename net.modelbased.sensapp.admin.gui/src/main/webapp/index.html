@@ -30,10 +30,8 @@
   </head>
 
   <body>
-	
-
-	
-    <div class="navbar navbar-fixed-top">
+    <div class="navbar-fixed-top">
+	<div class="navbar">
       <div class="navbar-inner">
         <div class="container-fluid">
           <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -44,27 +42,42 @@
           <a class="brand" href="#">SensApp</a>
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="active"><a href="index.html">Administration</a></li>
-              <li><a href="visualisation.html">Visualisation</a></li>
+              <li id="admin" class="active dropdown">
+				<a class="dropdown-toggle" data-toggle="dropdown" href="#admin">Administration<b class="caret"></b></a>
+				<ul class="dropdown-menu">
+					<li class="active"><a href="#">Sensors</a></li>     
+					<li><a href="compositeAdmin.html">Composites</a></li>  
+					<li><a href="notificationAdmin.html">Notifications</a></li>  
+					<li><a href="offlineUpload.html">Offline Upload</a></li>		
+				</ul>  
+			  </li>
+			  <li id="visu" class="dropdown">
+			  <a class="dropdown-toggle" data-toggle="dropdown" href="#visu">Visualisation<b class="caret"></b></a>
+			  	<ul class="dropdown-menu">
+					<li><a href="visualisation.html">Sensors</a></li>     
+					<li><a href="#">Composites</a></li> 
+					<li><a href="#">Dashboard</a></li>  
+				</ul>  
+			  </li>
             </ul>
+			<ul class="nav pull-right">
+				<li class="divider-vertical"></li>
+				<li><a href="index.html">Refresh page</a></li>
+			</ul>
           </div><!--/.nav-collapse -->
         </div>
+		</div>
       </div>
-    </div>
-
-    <div class="container-fluid">
-	<ul class="nav nav-tabs">  
-		<li class="active">  
-		<a href="#">Sensors</a>   </li>     
-		<li><a href="compositeAdmin.html">Composite</a></li>  
-		<li><a href="notificationAdmin.html">Notification</a></li>  
-        <li><a href="offlineUpload.html">Offline Upload</a></li>		
-	</ul>  
+	</div>
 	
+	<div class="span4 offset4" id="alert-div" style="position:fixed;width:40%;margin-top:10px;">
+	</div>
+	
+    <div class="container-fluid">
       <!-- Main hero unit for a primary marketing message or call to action -->
-      <div>
-		 <a href="#add-Sensor" data-toggle="modal" class="btn btn-primary">Add Sensor</button></a>
-      </div>
+		<h2>Sensors</h2>
+		 <a href="#add-Sensor" data-toggle="modal" class="btn btn-primary">New Sensor</a>
+
 
       <!-- Example row of columns -->
 <div style="margin-top:10px">
@@ -74,7 +87,6 @@
             <th>Name</th>
             <th>Description</th>  
             <th>Creation date</th>
-            <th>Backend</th>  		
 			<th>Actions</th>
           </tr>  
         </thead>  
@@ -88,6 +100,7 @@
       </footer>
 
     </div>
+
 	
 	
 <!---------------------
@@ -104,41 +117,41 @@
 			</thead>
 			<tbody id="form-body">
 			<tr id="id-row">
-				<td><b>Name* :</b></td> 
+				<td><b rel="tooltip" title="Identifier (unique)">Name* :</b></td> 
 				<td><input id="id" type="text" class="input-medium search-query" value=""></td>
 			</tr>
 			<tr id="descr-row">
-				<td><b>Description :</b></td> 
+				<td><b rel="tooltip" title="Description of the sensor">Description :</b></td> 
 				<td><input id="descr" type="text" class="input-medium search-query" value=""></td>
 			</tr>
 			<tr id="backend-row">
-				<td><b>Backend* :</b></td> 
+				<td><b rel="tooltip" title="Kind of database the data will be stored">Backend* :</b></td> 
 				<td>
 					<select id="backend" class="input-medium search-query" style="width:180px;">
 						<option>raw</option>
-						<option>RRDB</option>
 					</select>
 				</td>
 			</tr>
 			<tr id="template-row">
-				<td><b>Template* :</b></td> 
+				<td><b rel="tooltip" title="Type of data">Template* :</b></td> 
 				<td>
 					<select id="template" class="input-medium search-query" style="width:180px;">
 						<option>Numerical</option>
 						<option>String</option>
+						<option>Boolean</option>
 					</select>
 				</td>
 			</tr>
 			<tr id="update_time-row">
-				<td><b>Update Time :</b></td>
+				<td><b  rel="tooltip" title="The sensor's update rate">Update Time :</b></td>
 				<td><input id="update_time" type="text" class="input-medium search-query" value=""></td>
 			</tr>
 			<tr id="longitude-row">
-				<td><b>Longitude :</b></td>
+				<td rel="tooltip" title="Location of the sensor (lon)"><b>Longitude :</b></td>
 				<td><input id="longitude" type="text" class="input-medium search-query" value=""></td>
 			</tr>
 			<tr id="latitude-row">
-				<td><b>Latitude</b></td>
+				<td><b rel="tooltip" title="Location of the sensor (lat)">Latitude</b></td>
 				<td><input id="latitude" type="text" class="input-medium search-query" value=""></td>
 			</tr>
 			</tbody>
@@ -164,33 +177,33 @@
 <div class="modal-body">  
 	<table id="form" style="font-size:14px;margin-left:5%;" cellpadding="5px">
 			<tr>
-				<td><b>Name :</b></td> 
+				<td rel="tooltip" title="Identifier (unique)"><b>Name :</b></td> 
 		  <td><input id="id" type="text" class="input-medium search-query" disabled></td>
 			</tr>
 			<tr>
-				<td><b>Description :</b></td> 
+				<td><b rel="tooltip" title="Description of the sensor">Description :</b></td> 
 				<td><input id= "descr" type="text" class="input-medium search-query"></td>
 			</tr>
 			<tr>
-				<td><b>Creation Date :</b></td> 
+				<td><b rel="tooltip" title="The sensor's update rate">Creation Date :</b></td> 
 				<td><input id="creation_date" type="text" class="input-medium search-query" disabled></td>
 			</tr>
 			<tr>
-				<td><b>Backend :</b></td> 
+				<td><b rel="tooltip" title="Kind of database the data is stored">Backend :</b></td> 
 				<td>
 					<input id="kind" type="text" class="input-medium search-query" disabled>
 				</td>
 			</tr>
 			<tr>
-				<td><b>Update Time :</b></td>
+				<td rel="tooltip" title="The sensor's update rate"><b >Update Time :</b></td>
 				<td><input id="update_time" type="text" class="input-medium search-query"></td>
 			</tr>
 			<tr>
-				<td><b>Longitude :</b></td>
+				<td><b rel="tooltip" title="Location of the sensor (lon)">Longitude :</b></td>
 				<td><input id="longitude" type="text" class="input-medium search-query"></td>
 			</tr>
 			<tr>
-				<td><b>Latitude :</b></td>
+				<td><b rel="tooltip" title="Location of the sensor (lat)">Latitude :</b></td>
 				<td><input id="latitude" type="text" class="input-medium search-query"></td>
 			</tr>
 		</table>
@@ -199,8 +212,22 @@
 <a href="#" class="btn" onclick="addEvent('edit-Sensor','editTag','theValue');"><div class="icon-plus"></div>&nbsp;Custom Field</a>
 <a href="#" class="btn btn-primary" onclick="updateSensor($('#edit-Sensor').find('#id').attr('value'),topology,'edit-Sensor','dataTable');" data-dismiss="modal">Update</a>  
 <a href="#" class="btn" onclick="clearEditModal('edit-Sensor')" data-dismiss="modal">Close</a>  
+</div>
+</div> 
+
+<!---------------------
+-Delete Sensor Modal div--
+---------------------->	
+<div id="delete-Sensor" class="modal hide fade in" style="display: none; ">  
+<div class="modal-header">  
+<a class="close" data-dismiss="modal">&times;</a>  
+<h2></h2>
 </div>  
-</div>  	
+<div class="modal-footer">
+<a id="delete" href="#" class="btn btn-danger" data-dismiss="modal">Delete</a>  
+<a href="#" class="btn" data-dismiss="modal">Cancel</a>  
+</div>  
+</div> 	
 <input type="hidden" value="0" id="theValue" />
 
     <!-- Le javascript
@@ -213,6 +240,9 @@
 	<script type="text/javascript" charset="utf-8" language="javascript" src="bootstrap/js/DT_bootstrap.js"></script>
 	<script> var topology = getTopology();
 	getAllSensors(getURL(topology,"registry","/registry/sensors")+"?flatten=true",topology,"dataTable");
+	 $(document).ready(function () {
+		$("[rel=tooltip]").tooltip({placement:'left'});
+	});
 	</script>
 
     <script src="bootstrap/js/bootstrap-transition.js"></script>
