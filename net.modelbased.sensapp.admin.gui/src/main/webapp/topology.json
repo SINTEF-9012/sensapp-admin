@@ -5,9 +5,9 @@
     { "name": "localhost", "srv": "localhost", "port": "8080" }
   ],
   "deployment": [
-  	{ "service": "database.raw", "node": "local" },
-  	{ "service": "dispatch",     "node": "local" },
-  	{ "service": "notifier",     "node": "local" },
-  	{ "service": "registry",     "node": "local" }
+  	{ "service": "database.raw", "node": "localhost" },
+  	{ "service": "dispatch",     "node": "localhost" },
+  	{ "service": "notifier",     "node": "localhost" },
+  	{ "service": "registry",     "node": "localhost" }
   ]
 }

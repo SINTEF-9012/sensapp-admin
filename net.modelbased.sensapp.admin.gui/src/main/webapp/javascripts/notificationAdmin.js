@@ -52,8 +52,8 @@ function separateNotifiers(allSensors,targetURL,notifierTable,nonNotifierTable) 
 				var notifiersDisplay = { "aaData": notifiersArray, "aoColumn": notifiersColumns};
 				var nonNotifiersDisplay = { "aaData": nonNotifiersArray, "aoColumn": nonNotifiersColumms};
 				
-				$('#'+notifierTable).dataTable(notifiersDisplay).$("div[rel=popover]").popover({placement:'right'});
-				$('#'+nonNotifierTable).dataTable(nonNotifiersDisplay).$("div[rel=popover]").popover({placement:'right'});
+				tableToJqueryDataTable (notifiersArray,notifiersColumns,notifierTable);
+				tableToJqueryDataTable (nonNotifiersArray,nonNotifiersColumms,nonNotifierTable);
 			},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
@@ -100,6 +100,7 @@ function addToNonNotifierTableById(targetURL,row,notifierTable,nonNotifierTable)
 			function (sensor, textStatus, jqXHR) {
 				addRowToNonNotifierDatable(sensor,nonNotifierTable);
 				removeRow(row,notifierTable);
+				$('#'+nonNotifierTable).dataTable().$("div[rel=popover]").popover({placement:'right'});
 				alertMessage("success","Notifier removed",5000);
 			},
 		error: 
@@ -160,6 +161,7 @@ function addToNotifierTableById(targetURL,row,notifierTable,nonNotifierTable) {
 			function (sensor, textStatus, jqXHR) {
 				addRowToNotifierDatable(sensor,notifierTable,nonNotifierTable);
 				removeRow(row,nonNotifierTable);
+				$('#'+notifierTable).dataTable().$("div[rel=popover]").popover({placement:'right'});
 				alertMessage("success",sensor.id +" registered as notifier",5000);				
 			},
 		error: 

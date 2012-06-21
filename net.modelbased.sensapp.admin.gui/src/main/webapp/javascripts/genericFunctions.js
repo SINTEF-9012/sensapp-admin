@@ -29,8 +29,8 @@ function createDescriptionColumn(sensor,type) {
 
 	var div = $(document.createElement('div'))
 					.attr("rel","popover")
-
-					.attr("data-original-title","Additional Infos");
+					.attr("data-original-title","Additional Infos")
+					.html("<b>&times;</b>");
 	
 	if(sensor.descr!="")
 		div.text(sensor.descr);
@@ -54,28 +54,32 @@ function createDescriptionColumn(sensor,type) {
 }
 
 function alertMessage(type,message,timeout) {
-	alertDiv = $(document.createElement('div'))
-		.text(message)
-		.append(
-			$(document.createElement('a'))
-				.attr("class","close")
-				.attr("data-dismiss","alert")
-				.text("Close")
-		);
+	alertDiv = $(document.createElement('div'));
 			
 	switch (type) {
 		case "success":
-			alertDiv.attr("class","alert alert-success fade in");
+			alertDiv.attr("class","alert alert-success fade in")
+					.html("<b>Success.</b> "+message);
 			break;
 		case "error":
-			alertDiv.attr("class","alert alert-error fade in");
+			alertDiv.attr("class","alert alert-error fade in")
+					.html("<b>Error.</b> "+message);
 			break;
 		case "warning":
-			alertDiv.attr("class","alert fade in");
+			alertDiv.attr("class","alert fade in")
+					.html("<b>Warning.</b> "+message);
 			break;
 		default:
 			break;
 	}
+	
+	alertDiv.append(
+			$(document.createElement('a'))
+				.attr("class","close")
+				.attr("data-dismiss","alert")
+				.html("&times;")
+		);
+	
 	$('#alert-div').append(alertDiv);
 	if(typeof timeout!='undefined')
 		window.setTimeout(function() { $('#alert-div').find(':contains('+message+')').remove(); }, timeout);
@@ -222,8 +226,6 @@ function tableToJqueryDataTable (data,columns,div) {
 					}
 				}
 			} );
-				
-	
 				
 	$(document).ready(function() {
 		$("#"+div).dataTable({

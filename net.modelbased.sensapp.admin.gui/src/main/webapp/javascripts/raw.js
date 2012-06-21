@@ -7,9 +7,8 @@ function getSensor (targetURL) {
 		dataType:'json',
 		success: 
 			function (data, textStatus, jqXHR) {
-				display=''
-				displayRaw (data);
-				display+="}";
+				display='';
+				displayCollection (data);
 				$('body').html(display);
 			},
 		error: 
@@ -19,17 +18,44 @@ function getSensor (targetURL) {
 	});
 }
 
-function displayRaw (data) {
+function displayArray (data) {
+	display += "<div style='margin-left: 2em;'>[";
+	$.each(data,function(i,element) {
+		if(typeof element != 'object' || element==null) {
+			display+='<div>"'+element+'"</div>';
+		}
+		else {
+			if (element instanceof Array) {
+				display+='"'+i+'"';			
+				displayArray(element,"array");
+			}
+			else {
+				display+='"'+i+'":';		
+				displayCollection(element,"collection");	
+			}
 
+		}
+	});
+	display+=']</div>';
+}
+
+function displayCollection (data) {
 	display += "<div style='margin-left: 2em;'>{";
 	$.each(data,function(i,element) {
 		if(typeof element != 'object' || element==null) {
 			display+='<div>"'+i+'":"'+element+'"</div>';
 		}
 		else {
-			display+='<div>"'+i+'":</div>';
-			displayRaw(element);
-			display+='}</div>';
+			if (element instanceof Array) {
+				display+='"'+i+'":';	
+				displayArray(element,"array");
+			}
+			else {
+				display+='"'+i+'":';	
+				displayCollection(element,"collection");	
+			}
+
 		}
 	});
+	display+='}</div>';
 }

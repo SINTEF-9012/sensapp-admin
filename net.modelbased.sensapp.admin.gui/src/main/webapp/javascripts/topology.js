@@ -1,8 +1,5 @@
 function getTopology() {
-
-	var topology;
-
-	$.ajax({
+	/*$.ajax({
 		type: "get",
 		url: "./topology.json",
 		async:false,
@@ -16,7 +13,15 @@ function getTopology() {
 				alert(textStatus+":"+errorThrown);
 			}
 	});
-	return topology;
+	return topology;*/
+	if(localStorage.getItem("topology")!=null) {
+		return eval('(' + localStorage.getItem("topology") + ')');
+	}
+	else {
+		return null;
+	}
+	
+
 }
 
 function getURL(topology,partner,path) {
@@ -34,12 +39,17 @@ function getURL(topology,partner,path) {
 		return objects;
 	}
 
-	var item = getObjects(topology["deployment"],"service",partner);
-	var node = item[0].node;
-	item = getObjects(topology["nodes"],"name",node);
-	
-	if(item[0].srv!="" && item[0].port!="")
-		return "http://"+item[0].srv+":"+item[0].port+path;
-	else
-		return path;		
+	if(topology!=null) {
+		var item = getObjects(topology["deployment"],"service",partner);
+		var node = item[0].node;
+		item = getObjects(topology["nodes"],"name",node);
+		
+		if(item[0].srv!="" && item[0].port!="")
+			return "http://"+item[0].srv+":"+item[0].port+path;
+		else
+			return path;
+	}
+	else {
+		return path;
+	}
 }

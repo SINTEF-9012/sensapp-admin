@@ -26,10 +26,7 @@ function separateContained(allSensors,targetURL,containedTable,sensorTable) {
 		success: 
 			function (compositeInfos, textStatus, jqXHR) {
 				var containedArray = new Array();
-				var othersArray = new Array();
-				var containedColumns = [{"sTitle":"Name"},{"sTitle":"Description"},{"sTitle":"Actions"}];
-				var othersColumms = [{"sTitle":"Name"},{"sTitle":"Description"},{"sTitle":"Actions"}];
-				
+				var othersArray = new Array();		
 
 				$.each(allSensors, function (i,sensor) {
 					if(compositeInfos.sensors.indexOf("/registry/sensors/"+sensor.id) != -1) {
@@ -44,13 +41,13 @@ function separateContained(allSensors,targetURL,containedTable,sensorTable) {
 												createSensorActions(sensor,containedTable,sensorTable).html()]);
 					}
 				});
-				var containedDisplay = { "aaData": containedArray, "aoColumn": containedColumns};
-				var othersDisplay = { "aaData": othersArray, "aoColumn": othersColumms};
 
 				$('#'+containedTable).dataTable().fnClearTable();
 				$('#'+sensorTable).dataTable().fnClearTable();						
 				$('#'+containedTable).dataTable().fnAddData(containedArray);
 				$('#'+sensorTable).dataTable().fnAddData(othersArray);
+				$('#'+containedTable).dataTable().$("div[rel=popover]").popover({placement:'right'});
+				$('#'+sensorTable).dataTable().$("div[rel=popover]").popover({placement:'right'});
 			},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
@@ -126,6 +123,7 @@ function getDeleteInfos (sensorId,row,modalDiv,table) {
 }
 
 function dispatchSensors (sensorId,containedTable,sensorTable) {
+		$('#tablesDiv').find('#contained').find('h2').text("Sensors of "+sensorId);
 		getCompositeInformations(getURL(topology,'registry','/registry/sensors?flatten=true'),sensorId,containedTable,sensorTable);
 		$('#tablesDiv').find('#all').show();
 		$('#tablesDiv').find('#contained').show();
@@ -174,6 +172,7 @@ function addRowToContainedDataTableById(targetURL,containedTable,sensorTable) {
 		url: targetURL,
 		success: function (data,textStatus,jqXHR) {
 				addRowToContainedDataTable(data,containedTable,sensorTable);
+				$('#'+containedTable).dataTable().$("div[rel=popover]").popover({placement:'right'});			
 		},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
@@ -224,7 +223,7 @@ function deleteSelectedRows(containedDiv) {
 // Simple Sensors Table Functions
 //**********************************
 
-function getAllSensors (targetURL,containedTable,sensorTable) {
+/*function getAllSensors (targetURL,containedTable,sensorTable) {
 	$.ajax({
 		type: "get",
 		url: targetURL,
@@ -259,7 +258,7 @@ function displayAllSensors(data,containedTable,sensorTable) {
 				
 	$('#'+sensorTable).dataTable(sensorDisplay).$("div[rel=popover]").popover({placement:'right'});
 	
-}
+}*/
 
 function addRowToSensorDatatableById(targetURL,containedTable,sensorTable) {
 
@@ -267,7 +266,8 @@ function addRowToSensorDatatableById(targetURL,containedTable,sensorTable) {
 		type: "get",
 		url: targetURL,
 		success: function (data,textStatus,jqXHR) {
-				addRowToSensorDatatable(data,containedTable,sensorTable);
+			addRowToSensorDatatable(data,containedTable,sensorTable);
+			$('#'+sensorTable).dataTable().$("div[rel=popover]").popover({placement:'right'});				
 		},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
@@ -299,8 +299,6 @@ function createSensorActions(sensor,containedTable,sensorTable) {
 }
 
 function putSensors(targetURL) {
-
-	alert(JSON.stringify(containedList));
 
 	$.ajax({
 		type: "put",
@@ -348,6 +346,7 @@ function postComposite(targetURL,postData,compositeTable,containedTable,sensorTa
 		data: JSON.stringify(postData),
 		success: function (data,textStatus,jqXHR) {
 			addRowToCompositeDatable(postData,compositeTable,containedTable,sensorTable);
+			$('#'+compositeTable).dataTable().$("div[rel=popover]").popover({placement:'right'});
 			alertMessage("success",postData.id +" created",5000);
 		},
 		error: 

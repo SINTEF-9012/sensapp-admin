@@ -1,19 +1,6 @@
-Admin/Composite:
-
-  - revoir l'orga de la page:
-    - juste les composite par défaut
-    - View Contained Sensors ==> Manage content
-    - Dans manage content, voir les capteurs contenu (pour en virer) et les capteurs non contenus (pour en ajouter)
-    - "Select all" sur les table
-
 Admin/notification
   - view hooks => Manage hooks dans une modal:
     - liste des hooks, avec checkbox pour suppression, et un formulaire au début pour en ajouter un.
-
-Admin/Offline Upload:
-  - feddback sur action:
-    - http status == 200 => upload completed (text de la réponse)
-   - http status == 500 ==> alert rouge, mettre le texte de l'erreur
 
 Admin/Status
   - voir la topologie
@@ -24,24 +11,10 @@ Admin/Status
 Visualisation/Sensor
 
   - Bouton EXPORT (senml/json, senml/xml, CSV, ...)
-  - dernière colonne devient un bouton "visualize"
   - utiliser un tag "default_widget" pour spécifier quel widget graphique utiliser pour un capteur
 
-  - cliquer sur visualize:
-    - réduire la datable à uniquement la ligne sur laquelle on à cliqué
-    - apparition en dessous d'un widget de visulisation:
-      - par défaut: table, avec le nom du capteurs affiché
-      -  les différentes visualisation sont changeable par des boutons
-    - prendre par défaut les 10.000 derniers points (?limit=10000)
-    - gérer la fenêtre temporelle affichée: avoir accès aux paramètre from/to, ou limit.
     - (un bouton "configure" pour slectioner ces paramètres)
     - bouton refresh sur les visualisation
-
-  - "sexyfier" la time serie: 
-    - mieux gérer le temps, 
-    - series 1 => unité
-    - legende
-    - … 
 
 - Visualisation/Composite
 

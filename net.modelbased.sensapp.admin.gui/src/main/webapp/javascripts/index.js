@@ -42,8 +42,8 @@ function displayAllSensors(data,table) {
 
 }
 
-function addRowToSensorDataTable(sensor,sensorDiv) {
-	$('#'+sensorDiv).dataTable().fnAddData( [
+function addRowToSensorDataTable(sensor,sensorTable) {
+	$('#'+sensorTable).dataTable().fnAddData( [
 		createNameColumn(sensor.id,"sensor").html(),
 		createDescriptionColumn(sensor,"sensor").html(),
 		timeStampToDate(sensor.creation_date),
@@ -102,7 +102,7 @@ function postSensor(targetURL,postData,formDiv,tableDiv) {
 	});
 }
 
-function putSensorMetaData (targetURL,putData,sensorDiv,formDiv) {		 
+function putSensorMetaData (targetURL,putData,sensorTable,formDiv) {		 
 
 	$.ajax({
 		type: "put",
@@ -112,7 +112,8 @@ function putSensorMetaData (targetURL,putData,sensorDiv,formDiv) {
 		data: JSON.stringify(putData),
 		success: 
 			function (data, textStatus, jqXHR) {
-				addRowToSensorDataTable(data,sensorDiv);
+				addRowToSensorDataTable(data,sensorTable);
+				$('#'+sensorTable).dataTable().$("div[rel=popover]").popover({placement:'right'});
 				clearAddModal(formDiv);
 				alertMessage("success",data.id +" successfully added",5000);
 			},
@@ -169,7 +170,7 @@ function updateSensorMetaData (targetURL,putData,tableDiv) {
 
 function rewriteMetaData(data,tableDiv) {
 
-	colId = $('#'+tableDiv).find("th:contains('Actions')").index();
+	colId = $('#'+tableDiv).find("th:contains('Description')").index();
 	rowId = $('#'+tableDiv).find("tr").has("td:contains('"+data.id+"')").index();
 
 	var popoverContent = "";
@@ -191,7 +192,7 @@ function rewriteMetaData(data,tableDiv) {
 		});
 	}	
 
-	$('#'+tableDiv).find("tbody").find("tr").eq(rowId).find("td").eq(colId).find("#"+data.id+"-Infos").attr("data-content",popoverContent);
+	$('#'+tableDiv).find("tbody").find("tr").eq(rowId).find("td").eq(colId).find('div').attr("data-content",popoverContent);
 }
 
 function updateSensorDescr (targetURL,putData,tableDiv) {		 
@@ -217,7 +218,7 @@ function rewriteDescr(data,tableDiv) {
 	colId = $('#'+tableDiv).find("th:contains('Description')").index();
 	rowId = $('#'+tableDiv).find("tr").has("td:contains('"+data.id+"')").index();
 
-	$('#'+tableDiv).find("tbody").find("tr").eq(rowId).find("td").eq(colId).text(data.descr);
+	$('#'+tableDiv).find("tbody").find("tr").eq(rowId).find("td").eq(colId).find('div').text(data.descr);
 
 }
  
