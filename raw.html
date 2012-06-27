@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        font-family:"Courier New";
+	}
+    </style>
+	
+</head>
+<body>
+	<div class="span4 offset4" id="alert-div" style="position:fixed;width:40%;margin-top:10px;">
+	</div>	
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="bootstrap/js/bootstrap-alert.js"></script>
+<script type="text/javascript" src="./javascripts/genericFunctions.js"></script>
+<script type="text/javascript" src="./javascripts/queryString.js"></script>
+<script type="text/javascript" src="./javascripts/topology.js"></script>
+<script type="text/javascript" src="./javascripts/raw.js"></script>
+<script type="text/javascript">
+switch (getQuerystring("type")) {
+	case "sensor":
+		getSensor(getURL(getTopology(),"registry","/registry/sensors/"+getQuerystring("sensor")));
+		break;
+	case "composite":
+		getSensor(getURL(getTopology(),"registry","/registry/composite/sensors/"+getQuerystring("sensor")));
+		break;
+	case "notifier":
+		getSensor(getURL(getTopology(),"notifier","/notification/registered/"+getQuerystring("sensor")));		
+	default:
+		break;
+}
+</script>
+</body>
+</html>
