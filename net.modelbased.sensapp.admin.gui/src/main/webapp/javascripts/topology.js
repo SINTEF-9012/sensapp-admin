@@ -1,27 +1,22 @@
 function getTopology() {
-	/*$.ajax({
-		type: "get",
-		url: "./topology.json",
-		async:false,
-		dataType:"json",
-		success: 
-			function (data, textStatus, jqXHR) {
-				topology = data;
-			},
-		error: 
-			function (jqXHR, textStatus, errorThrown) {
-				alert(textStatus+":"+errorThrown);
-			}
-	});
-	return topology;*/
 	if(localStorage.getItem("topology")!=null) {
 		return eval('(' + localStorage.getItem("topology") + ')');
 	}
 	else {
-		return null;
-	}
 	
+		topology = 	{		
+		  "nodes": [{ "name": "local", "srv": "", "port": "" }],
+		  "deployment": [
+			{ "service": "database.raw", "node": "local" },
+			{ "service": "dispatch",     "node": "local" },
+			{ "service": "notifier",     "node": "local" },
+			{ "service": "registry",     "node": "local" }
+		  ]
+		};
+	
+		return  topology;
 
+	}
 }
 
 function getURL(topology,partner,path) {

@@ -2,7 +2,7 @@
 // Init Functions
 //**********************************
 
-function getNotificationInformations(targetURL,topology,notifierDiv,nonNotifierDiv) {
+function getNotificationInformations(targetURL,notifierDiv,nonNotifierDiv) {
 
 	$.ajax({
 		type: "get",
@@ -11,7 +11,7 @@ function getNotificationInformations(targetURL,topology,notifierDiv,nonNotifierD
 		dataType:'json',
 		success: 
 			function (allSensors, textStatus, jqXHR) {
-				separateNotifiers(allSensors,getURL(topology,"notifier","/notification/registered"),notifierDiv,nonNotifierDiv);	
+				separateNotifiers(getURL(getTopology(),"notifier","/notification/registered?flatten=true"),allSensors,notifierDiv,nonNotifierDiv);	
 			},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
@@ -20,7 +20,7 @@ function getNotificationInformations(targetURL,topology,notifierDiv,nonNotifierD
 	});
 }
 
-function separateNotifiers(allSensors,targetURL,notifierTable,nonNotifierTable) {
+function separateNotifiers(targetURL,allSensors,notifierTable,nonNotifierTable) {
 
 	$.ajax({
 		type: "get",
@@ -33,25 +33,28 @@ function separateNotifiers(allSensors,targetURL,notifierTable,nonNotifierTable) 
 				var nonNotifiersArray = new Array();
 				var notifiersColumns = [{"sTitle":"Name"},{"sTitle":"Description"},{"sTitle":"Creation Date"},{"sTitle":"Actions"}];
 				var nonNotifiersColumms = [{"sTitle":"Name"},{"sTitle":"Description"},{"sTitle":"Creation Date"},{"sTitle":"Actions"}];
-				
 				$.each(allSensors, function (i,sensor) {
-					if(notifierSensors.indexOf("/notification/registered/"+sensor.id) != -1) {
-						notifiersArray.push([createNameColumn(sensor.id,"notifier").html(),
-											 createDescriptionColumn(sensor,"notifier").html(),
-											 timeStampToDate(
-											 sensor.creation_date),
-											 createNotifierActions(sensor,notifierTable,nonNotifierTable).html()]);
+					var isNotifier=false;
+					var i=0;
+					while(isNotifier == false && i<notifierSensors.length) {
+						if(notifierSensors[i].sensor==sensor.id) {
+							isNotifier=true;				
+						}
+						i++;
 					}
-					else {
+					if(isNotifier==false) {
 						nonNotifiersArray.push([createNameColumn(sensor.id,"sensor").html(),
 												createDescriptionColumn(sensor,"sensor").html(),
 												timeStampToDate(sensor.creation_date),
 												createNonNotifierActions(sensor).html()]);
 					}
-				});
-				var notifiersDisplay = { "aaData": notifiersArray, "aoColumn": notifiersColumns};
-				var nonNotifiersDisplay = { "aaData": nonNotifiersArray, "aoColumn": nonNotifiersColumms};
-				
+					else {
+						notifiersArray.push([createNameColumn(sensor.id,"notifier").html(),
+							 createDescriptionColumn(sensor,"notifier").html(),
+							 timeStampToDate(sensor.creation_date),
+							 createNotifierActions(sensor,notifierTable,nonNotifierTable).html()]);
+					}
+				});			
 				tableToJqueryDataTable (notifiersArray,notifiersColumns,notifierTable);
 				tableToJqueryDataTable (nonNotifiersArray,nonNotifiersColumms,nonNotifierTable);
 			},
@@ -67,12 +70,12 @@ function separateNotifiers(allSensors,targetURL,notifierTable,nonNotifierTable) 
 // Non Notifier Table Functions
 //**********************************
 
-function registerNotifier(sensorName,topology,row,notifierTable,nonNotifierTable) {
+function registerNotifier(sensorName,row,notifierTable,nonNotifierTable) {
 	var postData = getNotifierToPost(sensorName);
-	postNotifier(getURL(topology,"notifier","/notification/registered"),postData,row,notifierTable,nonNotifierTable,topology);
+	postNotifier(getURL(getTopology(),"notifier","/notification/registered"),postData,row,notifierTable,nonNotifierTable);
 }
 
-function postNotifier(targetURL,postData,row,notifierTable,nonNotifierTable,topology) {
+function postNotifier(targetURL,postData,row,notifierTable,nonNotifierTable) {
 
 	$.ajax({
 		type: "post",
@@ -80,7 +83,7 @@ function postNotifier(targetURL,postData,row,notifierTable,nonNotifierTable,topo
 		contentType: "application/json",
 		data: JSON.stringify(postData),
 		success: function (data,textStatus,jqXHR) {
-			addToNotifierTableById(getURL(topology,"registry","/registry/sensors/"+postData.sensor),row,notifierTable,nonNotifierTable);
+			addToNotifierTableById(getURL(getTopology(),"registry","/registry/sensors/"+postData.sensor),row,notifierTable,nonNotifierTable);
 		},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
@@ -118,7 +121,7 @@ function createNonNotifierActions(sensor) {
 			$(document.createElement('a'))
 				.attr("class","btn btn-primary")
 				.attr("href","#")
-				.attr("onclick","registerNotifier('"+sensor.id+"',topology,this.parentNode.parentNode,'notifierTable','nonNotifierTable',topology)")
+				.attr("onclick","registerNotifier('"+sensor.id+"',this.parentNode.parentNode,'notifierTable','nonNotifierTable')")
 				.text("Add To Notifiers")
 		);	
 }
@@ -141,7 +144,7 @@ function deleteNotifier(targetURL,sensorId,row,notifierTable,nonNotifierTable) {
 		url: targetURL,
 		success: 
 			function (data, textStatus, jqXHR) {
-				addToNonNotifierTableById(getURL(topology,"registry","/registry/sensors/"+sensorId),row,notifierTable,nonNotifierTable);
+				addToNonNotifierTableById(getURL(getTopology(),"registry","/registry/sensors/"+sensorId),row,notifierTable,nonNotifierTable);
 			},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
@@ -188,9 +191,10 @@ function createNotifierActions(sensor,notifierTable,nonNotifierTable) {
 				.attr("id",sensor.id+"-Hooks")
 				.attr("href","#hook-Modal")
 				.attr("data-toggle","modal")
-				.attr("onclick","getHookList(getURL(topology,'notifier','/notification/registered/"+sensor.id+"'),'hook-List')")
-				.text("View Hooks")
+				.attr("onclick","getHookList(getURL(getTopology(),'notifier','/notification/registered/"+sensor.id+"'),'hook-Modal')")
+				.text("Manage Hooks")
 		)
+		.append(' ')
 		.append(
 			//Remove As Notifier Button
 			$(document.createElement('a'))
@@ -198,14 +202,14 @@ function createNotifierActions(sensor,notifierTable,nonNotifierTable) {
 				.attr("data-toggle","modal")
 				.attr("onclick","getDeleteInfos('"+sensor.id+"',this.parentNode.parentNode,'delete-Sensor','"+notifierTable+"','"+nonNotifierTable+"');")
 				.attr("class","btn btn-danger")
-				.text("Remove As Notifier")
+				.html("<b style='font-size:16px'>&times;</b>")
 		);	
 }
 
 function getDeleteInfos (sensorId,row,modalDiv,notifierTable,nonNotifierTable) {
 	$('#'+modalDiv).find('h2').text("Delete " + sensorId + " ?");
 	$('#'+modalDiv).find('#delete').unbind('click').click( function () {
-			deleteNotifier(getURL(topology,'notifier','/notification/registered/'+sensorId),sensorId,row,notifierTable,nonNotifierTable);
+			deleteNotifier(getURL(getTopology(),'notifier','/notification/registered/'+sensorId),sensorId,row,notifierTable,nonNotifierTable);
 	});
 }
 
@@ -214,15 +218,14 @@ function getDeleteInfos (sensorId,row,modalDiv,notifierTable,nonNotifierTable) {
 // Hooks Admin Functions
 //**********************************
 
-function getHookList(targetURL,hookTable) {
+function getHookList(targetURL,hookModal) {
 
 	$.ajax({
 		type: "get",
 		url: targetURL,
 		success: 
 			function (data, textStatus, jqXHR) {
-				var hookList = data.hooks; 
-				displayHookList(hookList,hookTable);
+				displayHookModal(data,hookModal);
 			},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
@@ -231,22 +234,64 @@ function getHookList(targetURL,hookTable) {
 	});
 }
 
-function displayHookList(hookList,hookTable) {
-	$.each(hookList,function(i,hook) {
-	addRowToHookDatable(hook,hookTable);
+function displayHookModal(notifier,hookModal) {
+
+	$('#'+hookModal).find('h2').text("Hook list of "+notifier.sensor);
+	$('#'+hookModal).find('#register').attr("onclick","registerHooks('"+hookModal+"','"+notifier.sensor+"');clearHookModal('"+hookModal+"')");
+	
+	$.each(notifier.hooks,function(i,hook) {
+		addRowToHookDatable(hook,hookModal);
 	});
 }
 
-function addRowToHookDatable(hook,hookTable) {
-	$('#'+hookTable).dataTable().fnAddData( [
-	hook,
-	createHookActions(hook).innerHTML] );
+function addRowToHookDatable(hook,hookModal) {
+	$('#'+hookModal).find('tbody')
+		.append($(document.createElement('tr'))
+			.append($(document.createElement('td'))
+					.text(hook))
+			.append($(document.createElement('td'))
+					.append(
+						$(document.createElement('button'))
+							.attr("class","btn btn-danger")
+							.click( function () {
+								$(this).closest('tr').remove();
+							})
+							.css("font-size","16px")
+							.css("font-weight","bold")
+							.html("&times;")))
+		);
 }
 
-function createHookActions(hook) {
-	return $(document.createElement('td'))
-				.text("Button");		
+function clearHookModal(modalDiv) {
+	$("#"+modalDiv).find('tbody').empty();
+	$("#"+modalDiv).find('input').val("");
 }
+
+function registerHooks(modalDiv,sensorId) {
+
+	var hookList = new Array();
+	$.each($("#"+modalDiv).find('table>tbody>tr>td:nth-child(1)'),function (i,hook) {
+		hookList.push(hook.innerHTML);
+	});
+
+	$.ajax({
+		type: "put",
+		contentType: "application/json",
+		async:false,
+		url: getURL(getTopology(),"notifier","/notification/registered/"+sensorId),
+		data: JSON.stringify({"sensor":sensorId,"hooks":hookList}),
+		success: 
+			function (data, textStatus, jqXHR) {
+				alertMessage("success","Hooks updated",5000);
+			},
+		error: 
+			function (jqXHR, textStatus, errorThrown) {
+				alertMessage("error",errorThrown,5000);
+			}
+	});
+	
+}
+
 
 //*********************************
 // Get JSON functions

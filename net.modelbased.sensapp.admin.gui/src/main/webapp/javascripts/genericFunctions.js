@@ -27,30 +27,38 @@ function createNameColumn(sensorId,type) {
 
 function createDescriptionColumn(sensor,type) {
 
+	var popoverContent;
+	switch (type) {
+		case "sensor": 
+				popoverContent = getPopoverContent(sensor);
+			break;
+		case "composite":
+				popoverContent = getCompositePopoverContent(sensor);
+			break;
+		case "notifier":
+				popoverContent = getPopoverContent(sensor);
+			break;			
+		default:
+			popoverContent = "";
+			break;
+	}
+
+	var text;
+	if(sensor.descr!="")
+		text = sensor.descr;
+	else
+		text = "n.a.";
+	
+	if (popoverContent != "") {
 	var div = $(document.createElement('div'))
 					.attr("rel","popover")
 					.attr("data-original-title","Additional Infos")
-					.html("<b>&times;</b>");
-	
-	if(sensor.descr!="")
-		div.text(sensor.descr);
-	else
-		div.text("n.a.");
-
-	switch (type) {
-		case "sensor": 
-			div.attr("data-content",getPopoverContent(sensor));
-			break;
-		case "composite":
-			div.attr("data-content",getCompositePopoverContent(sensor));
-			break;
-		case "notifier":
-			div.attr("data-content",getPopoverContent(sensor));
-			break;			
-		default:
-			break;
+					.attr("data-content",popoverContent)
+					.attr("class","icon-plus-sign");
+		return $(document.createElement('div')).append(text).append(' ').append(div);
 	}
-	return $(document.createElement('div')).append(div);
+	else
+		return $(document.createElement('div')).append(text);
 }
 
 function alertMessage(type,message,timeout) {
@@ -128,7 +136,12 @@ function removeRow(row,dataTable) {
 	$('#'+table).dataTable().fnAdjustColumnSizing();
 }
 
-function tableToJqueryDataTable (data,columns,div) {
+function tableToJqueryDataTable (data,columns,div,sorting) {
+
+			if(typeof sorting == 'undefined') {
+				sorting='asc';
+			}
+
 			/* Default class modification */
 			$.extend( $.fn.dataTableExt.oStdClasses, {
 				"sSortAsc": "header headerSortDown",
@@ -226,14 +239,14 @@ function tableToJqueryDataTable (data,columns,div) {
 					}
 				}
 			} );
-				
 	$(document).ready(function() {
 		$("#"+div).dataTable({
 			"aaData": data,	
+			"aaSorting": [[ 0, sorting ]],
 			"aoColumn": columns,
 			"sPaginationType": "bootstrap",
 			"oLanguage": {
-			"sLengthMenu": "_MENU_ records per page" 
+				"sLengthMenu": "_MENU_ records per page" ,
 			}
 		}).$("div[rel=popover]").popover({placement:'right'});
 	});

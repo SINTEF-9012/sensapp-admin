@@ -88,7 +88,7 @@
 			</div>
 		</div>
 		<div class="span4">
-		<a class="btn" onclick="loadFile(getURL(topology,'database.raw','/databases/raw/load'),'loadDiv');">Load</a>
+		<a class="btn" onclick="loadFile(getURL(getTopology(),'database.raw','/databases/raw/load'),'loadDiv');">Load</a>
 		</div>
 	</div>
 	
@@ -98,7 +98,6 @@
     <script type="text/javascript" src="./javascripts/genericFunctions.js"></script>
 	<script type="text/javascript" src="./javascripts/offlineUpload.js"></script>
 	<script type="text/javascript" src="./javascripts/topology.js"></script>
-	<script> var topology = getTopology(); </script>
     <script src="bootstrap/js/bootstrap-transition.js"></script>
     <script src="bootstrap/js/bootstrap-alert.js"></script>
     <script src="bootstrap/js/bootstrap-modal.js"></script>

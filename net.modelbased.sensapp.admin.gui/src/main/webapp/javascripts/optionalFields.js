@@ -22,8 +22,11 @@ function addEvent(div,elementNames,refValue) {
 	newCell.append(newInput);
 	newText = $(document.createElement('b'))
 		.attr('class','btn')
-		.attr('onclick',"removeElement('"+$('#'+refValue).attr('value')+elementNames+"Row','"+div+"');")
-		.text("X");	
+		.css("font-size","16px")
+		.unbind('click').click(function() {
+		 $(this).closest('tr').remove();
+		})
+		.html("&times;");	
 	newCell.append(newText);
 	newRow.append(newCell);
 

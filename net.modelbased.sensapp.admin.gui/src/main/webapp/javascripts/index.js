@@ -2,7 +2,7 @@
 // Main Table Functions
 //**********************************
 
-function getAllSensors (targetURL,topology,div) {
+function getAllSensors (targetURL,div) {
 	$.ajax({
 		type: "get",
 		url: targetURL,
@@ -22,9 +22,6 @@ function getAllSensors (targetURL,topology,div) {
 }
 
 function displayAllSensors(data,table) {
-	/*$.each(data, function(i,element) {
-		addRowToSensorDataTable(element,div);
-	});*/
 	
 	var sensorArray = new Array();
 	var sensorColumns = [{"sTitle":"Name"},{"sTitle":"Description"},{"sTitle":"Creation Date"},{"sTitle":"Actions"}];
@@ -37,8 +34,7 @@ function displayAllSensors(data,table) {
 						  createSensorActions(sensor).html()]);
 	});
 	tableToJqueryDataTable (sensorArray,sensorColumns,table);
-//	var sensorDisplay = { "aaData": sensorArray,	"aoColumn": sensorColumns};
-//	$('#'+table).dataTable(sensorDisplay).$("div[rel=popover]").popover({placement:'right'});
+
 
 }
 
@@ -59,19 +55,20 @@ function createSensorActions(sensor) {
 			//Edit Button
 			$(document.createElement('a'))
 				.attr("href","#edit-Sensor")
-				.attr("onclick","getMoreInputInfos(getURL(topology,'registry','/registry/sensors/"+sensor.id+"'),'edit-Sensor')")
+				.attr("onclick","getMoreInputInfos(getURL(getTopology(),'registry','/registry/sensors/"+sensor.id+"'),'edit-Sensor')")
 				.attr("data-toggle","modal")
 				.attr("class","btn")
 				.text("Edit")
 		)
-		.append(
+		.append(' ')
 			//Delete Button
+		.append(
 			$(document.createElement('a'))
 				.attr("href","#delete-Sensor")
 				.attr("data-toggle","modal")
 				.attr("onclick","getDeleteInfos('"+sensor.id+"',this.parentNode.parentNode,'delete-Sensor','dataTable')")
 				.attr("class","btn btn-danger")
-				.text("Delete")
+				.html("<b style='font-size:16px'>&times;</b>")
 		);
 }
 
@@ -79,9 +76,9 @@ function createSensorActions(sensor) {
 // Add Modal Functions
 //**********************************
 
-function registerSensor(topology,formDiv,tableDiv) {
+function registerSensor(formDiv,tableDiv) {
 		var postData = getSensorToPost(formDiv);
-		postSensor(getURL(topology,"registry","/registry/sensors"),postData,formDiv,tableDiv);
+		postSensor(getURL(getTopology(),"registry","/registry/sensors"),postData,formDiv,tableDiv);
 	}
 
 function postSensor(targetURL,postData,formDiv,tableDiv) {
@@ -148,51 +145,23 @@ function getMoreInputInfos(targetURL,div) {
 	});	
 }
 
-function updateSensorMetaData (targetURL,putData,tableDiv) {		 
+function updateSensorMetaData (targetURL,descr,metaData,tableDiv) {		 
 
 	$.ajax({
 		type: "put",
 		url: targetURL,
 		contentType: "application/json",
 		dataType:'json',
-		data: JSON.stringify(putData),
+		data: JSON.stringify(metaData),
 		success: 
 			function (data, textStatus, jqXHR) {
-				rewriteMetaData(data,tableDiv);
-				clearEditModal('edit-Sensor');
-				alertMessage("success","Information Updated",5000);
+				updateSensorDescr(targetURL,descr,tableDiv);
+
 			},
 		error: function (jqXHR, textStatus, errorThrown) {
 				alertMessage("error",errorThrown,5000);
 			}
 	});
-}
-
-function rewriteMetaData(data,tableDiv) {
-
-	colId = $('#'+tableDiv).find("th:contains('Description')").index();
-	rowId = $('#'+tableDiv).find("tr").has("td:contains('"+data.id+"')").index();
-
-	var popoverContent = "";
-	if(data.infos.update_time!=null) {
-		popoverContent = popoverContent + "<li>Update time : " + data.infos.update_time + "</li>";
-	}
-
-	if(data.infos.loc!=null) {
-		if(data.infos.loc.longitude!=null) {
-			popoverContent = popoverContent + "<li>Longitude Loc : " + data.infos.loc.longitude + "</li>";
-		}
-		if(data.infos.loc.latitude!=null) {
-			popoverContent = popoverContent + "<li>Latitude Loc : " + data.infos.loc.latitude + "</li>";
-		}
-	}
-	if(data.infos.tags!=null) {
-		$.each(data.infos.tags, function(i,element) {
-			popoverContent = popoverContent + "<li>"+i+" : " + element + "</li>";
-		});
-	}	
-
-	$('#'+tableDiv).find("tbody").find("tr").eq(rowId).find("td").eq(colId).find('div').attr("data-content",popoverContent);
 }
 
 function updateSensorDescr (targetURL,putData,tableDiv) {		 
@@ -206,6 +175,8 @@ function updateSensorDescr (targetURL,putData,tableDiv) {
 		success: 
 			function (data, textStatus, jqXHR) {
 				rewriteDescr(data,tableDiv);
+				clearEditModal('edit-Sensor');
+				alertMessage("success","Information Updated",5000);
 			},
 		error: function (jqXHR, textStatus, errorThrown) {
 				alertMessage("error",errorThrown,5000);
@@ -218,7 +189,8 @@ function rewriteDescr(data,tableDiv) {
 	colId = $('#'+tableDiv).find("th:contains('Description')").index();
 	rowId = $('#'+tableDiv).find("tr").has("td:contains('"+data.id+"')").index();
 
-	$('#'+tableDiv).find("tbody").find("tr").eq(rowId).find("td").eq(colId).find('div').text(data.descr);
+	$('#'+tableDiv).find("tbody").find("tr").eq(rowId).find("td").eq(colId).html(createDescriptionColumn(data,"sensor").html());
+	$('#'+tableDiv).dataTable().$("div[rel=popover]").popover({placement:'right'});
 
 }
  
@@ -246,25 +218,36 @@ function rewriteDescr(data,tableDiv) {
 	}
 	if(typeof data.infos.tags != 'undefined'){
 		$.each(data.infos.tags, function(i,element) {
-			var newRow = $(document.createElement('tr'))
-				.attr('id',i+'TagRow');
-			var customField = $(document.createElement('td'))
-				.attr("style","font-weight:bold;").append(i + " :")
-				.attr('id',i+'TagField');
-			var customValue = $(document.createElement('td'));
-			var input = $(document.createElement('input'))
-				.attr('id',i+'TagValue')
-				.attr("class","input-medium search-query")
-				.attr("value",element);
-			customValue.append(input);		
-			var cross = $(document.createElement('b'))
-				.attr("class","btn btn-danger")
-				.attr("onclick","removeElement('"+i+"TagRow','"+div+"')")
-				.text("X");
-			customValue.append(cross);
-			newRow.append(customField);
-			newRow.append(customValue);
-			$('#'+div).find('#form').find('tbody').append(newRow);
+			$('#'+div).find('#form').find('tbody')
+				.append(
+					$(document.createElement('tr'))
+						.attr('id',i+'TagRow')
+						.append(
+							$(document.createElement('td'))
+								.attr("style","font-weight:bold;")
+								.attr('id',i+'ExistingTagField')
+								.append(
+									$(document.createElement('span'))
+										.text(i))
+								.append(" :"))
+						.append(
+							$(document.createElement('td'))
+								.attr('id',i+'TagValue')
+								.append(
+									$(document.createElement('input'))
+										.attr("class","input-medium search-query")
+										.attr("value",element))	
+								.append(' ')
+								.append(
+									$(document.createElement('b'))
+										.attr("class","btn btn-danger")
+										.css("font-size","16px")
+										.unbind('click').click( function () {
+											$(this).closest('tr').remove();
+										})
+										.html("&times;"))
+						)
+				);
 		});
 	}
 }
@@ -272,16 +255,14 @@ function rewriteDescr(data,tableDiv) {
 function clearEditModal(div) {
 	$('#'+div).find('#title').empty();
 	$('#'+div).find('tr[id$="TagRow"]').remove();
+	$('#'+div).find('#descr').attr("value","");
 	$('#'+div).find('#update_time').attr("value","");
 	$('#'+div).find('#longitude').attr("value","");
 	$('#'+div).find('#latitude').attr("value","");
 }
 
-function updateSensor(id,topology,formDiv,tableDiv) {
-	var putData = getSensorInfosToPut(formDiv);
-	updateSensorMetaData(getURL(topology,"registry","/registry/sensors/"+id),putData,tableDiv);
-	var descr = getJSONDescr(formDiv);
-	updateSensorDescr(getURL(topology,"registry","/registry/sensors/"+id),descr,tableDiv);
+function updateSensor(id,formDiv,tableDiv) {
+	updateSensorMetaData(getURL(getTopology(),"registry","/registry/sensors/"+id),getJSONDescr(formDiv),getSensorInfosToPut(formDiv),tableDiv);
 }
 
 //*********************************
@@ -291,7 +272,7 @@ function updateSensor(id,topology,formDiv,tableDiv) {
 function getDeleteInfos(sensorId,row,modalDiv,table) {
 	$('#'+modalDiv).find('h2').text("Delete " + sensorId + " ?");
 	$('#'+modalDiv).find('#delete').unbind('click').click( function () {
-		deleteSensor(getURL(topology,'registry','/registry/sensors/'+sensorId),row,table);
+		deleteSensor(getURL(getTopology(),'registry','/registry/sensors/'+sensorId),row,table);
 	});
 }
 
@@ -343,14 +324,13 @@ function getTags(div) {
 	
 	var fields = new Array();
 	var values = new Array();
-	$.each($('#'+div).find('td[id$="TagField"]').has('input'),function(i,element) {
-		fields.push($(element).find('input').attr('value'));
-	});
-	$.each($('#'+div).find('td[id$="TagField"]').not('input'),function(i,element) {
+	$.each($('#'+div).find('td[id$="ExistingTagField"]').find('span'),function(i,element) {
 		fields.push($(element).text());
+		values.push($(this).closest('td').next('td').find('input').val());
 	});
-	$.each($('#'+div).find('td[id$="TagValue"]'),function(i,element) {
-		values.push($(element).find('input').attr('value'));
+	$.each($('#'+div).find('td[id$="NonExistingTagField"]').find('input[value!=""]'),function(i,element) {
+		fields.push($(element).val());
+		values.push($(this).closest('td').next('td').find('input').val());
 	});
 	jsonString = '{'
 	if(fields.length!=0) {

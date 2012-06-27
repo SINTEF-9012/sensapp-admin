@@ -115,22 +115,24 @@
 ---------------------->	
 <div id="hook-Modal" class="modal hide fade in" style="display: none; ">  
 <div class="modal-header">  
-<a class="close" data-dismiss="modal">&times;</a>  
+<a class="close" data-dismiss="modal" onclick="clearHookModal('hook-Modal')">&times;</a>  
 <h2>Hook List</h2>
 </div>  
 <div class="modal-body" style="font-size:14px;margin-left:5%;">  
-<table id="hook-List">
+<table id="hook-List" class="table table-striped table-bordered" cellpadding="0" cellspacing="0" border="0">
 <thead>
 <th>Hook</th>
-<th>Actions</th>
+<th>Delete</th>
 </thead>
 <tbody>
 </tbody>
 </table>
 </div> 
-<div class="modal-footer">  
-<a href="#" class="btn btn-primary" onClick="" data-dismiss="modal">Register</a>  
-<a href="#" class="btn" data-dismiss="modal">Close</a>  
+<div class="modal-footer">
+<input id="newHook" type="text" class="input-large search-query"></input>
+<a href="#" class="btn" onclick="addRowToHookDatable($('#newHook').val(),'hook-List');$('#newHook').val('');"><div class="icon-plus"></div>&nbsp;Add</a> 
+<a href="#" id="register" class="btn btn-primary"  data-dismiss="modal">Register</a>  
+<a href="#" class="btn" data-dismiss="modal" onclick="clearHookModal('hook-Modal')">Close</a>  
 </div>  
 </div> 
 
@@ -147,7 +149,7 @@
 <a href="#" class="btn" data-dismiss="modal">Cancel</a>  
 </div>  
 </div> 	
-
+<input type="hidden" value="0" id="theValue"/>
 	<!-- /container -->
     <!-- Le javascript
     ================================================== -->
@@ -158,8 +160,8 @@
 	<script type="text/javascript" src="./javascripts/topology.js"></script>
     <script src="./javascripts/optionalFields.js"></script>
 	<script type="text/javascript" charset="utf-8" language="javascript" src="bootstrap/js/DT_bootstrap.js"></script>
-	<script> var topology = getTopology();
-	getNotificationInformations(getURL(topology,"registry","/registry/sensors")+"?flatten=true",topology,"notifierTable","nonNotifierTable");
+	<script>
+	getNotificationInformations(getURL(getTopology(),"registry","/registry/sensors")+"?flatten=true","notifierTable","nonNotifierTable");
 	</script>
 
     <script src="bootstrap/js/bootstrap-transition.js"></script>

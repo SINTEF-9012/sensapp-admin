@@ -1,13 +1,3 @@
-Admin/notification
-  - view hooks => Manage hooks dans une modal:
-    - liste des hooks, avec checkbox pour suppression, et un formulaire au début pour en ajouter un.
-
-Admin/Status
-  - voir la topologie
-  - Panic button "Reset SensApp"
-    1. effacer les composite un par un
-    2. effacer les sensors un par un (notifier automatiquement effacé au passage)
-
 Visualisation/Sensor
 
   - Bouton EXPORT (senml/json, senml/xml, CSV, ...)

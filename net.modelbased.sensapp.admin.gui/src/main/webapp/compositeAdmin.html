@@ -92,7 +92,7 @@
 </div>
 <div id="contained" hidden>
 <h2>Contained Sensors</h2>
-<div  style="margin-bottom:10px"><a class="btn btn-primary" onclick="$('#tablesDiv').find('#composite').show();$('#tablesDiv').find('#contained').hide();$('#tablesDiv').find('#all').hide();putSensors(getURL(topology,'registry','/registry/composite/sensors/'+currentComposite))">Register</a>&nbsp;<a class="btn" onclick="$('#tablesDiv').find('#composite').show();$('#tablesDiv').find('#contained').hide();$('#tablesDiv').find('#all').hide()">Cancel</a></div>
+<div  style="margin-bottom:10px"><a class="btn btn-primary" onclick="$('#tablesDiv').find('#composite').show();$('#tablesDiv').find('#contained').hide();$('#tablesDiv').find('#all').hide();putSensors(getURL(getTopology(),'registry','/registry/composite/sensors/'+currentComposite))">Register</a>&nbsp;<a class="btn" onclick="$('#tablesDiv').find('#composite').show();$('#tablesDiv').find('#contained').hide();$('#tablesDiv').find('#all').hide()">Cancel</a></div>
 <table id="containedSensorTable" class="table table-striped table-bordered" cellpadding="0" cellspacing="0" border="0">  
         <thead>  
           <tr>  
@@ -152,8 +152,39 @@
 </div> 
 <div class="modal-footer">
 <a href="#" class="btn" onclick="addEvent('add-Composite','addTag','theValue');"><div class="icon-plus"></div>&nbsp;Custom Field</a>
-<a href="#" class="btn btn-primary" onClick="registerComposite(topology,'add-form','compositeList','compositeTable','containedSensorTable','sensorTable');" data-dismiss="modal">Register</a>  
+<a href="#" class="btn btn-primary" onClick="registerComposite('add-form','compositeTable','containedSensorTable','sensorTable');" data-dismiss="modal">Register</a>  
 <a href="#" class="btn" onClick="clearAddModal('add-Composite')" data-dismiss="modal">Close</a>  
+</div>  
+</div> 
+
+<!---------------------
+-Edit Composite Modal div--
+---------------------->	
+<div id="edit-Composite" class="modal hide fade in" style="display: none; ">  
+<div class="modal-header">  
+<a class="close" onClick="clearEditModal('edit-Composite');"  data-dismiss="modal">&times;</a>  
+<h2 id="title"></h2>
+</div>  
+<div class="modal-body">  
+		<table id="edit-form" style="font-size:14px;margin-left:5%;" cellpadding="5px">
+			<thead>
+			</thead>
+			<tbody id="form-body">
+			<tr id="id-row">
+				<td><b rel="tooltip" title="Identifier (unique)">Name* :</b></td> 
+				<td><input id="id" type="text" class="input-medium search-query" disabled></td>
+			</tr>
+			<tr id="descr-row">
+				<td><b rel="tooltip" title="Description of the composite sensor">Description :</b></td> 
+				<td><input id="descr" type="text" class="input-medium search-query" value=""></td>
+			</tr>
+		</table>
+		<i>* Mandatory</i>      
+</div> 
+<div class="modal-footer">
+<a href="#" class="btn" onclick="addEvent('edit-Composite','editNonExistingTag','theValue');"><div class="icon-plus"></div>&nbsp;Custom Field</a>
+<a href="#" class="btn btn-primary" onclick="editComposite('edit-Composite')" data-dismiss="modal">Register</a>  
+<a href="#" class="btn" onClick="clearEditModal('edit-Composite')" data-dismiss="modal">Close</a>  
 </div>  
 </div> 
 
@@ -181,12 +212,12 @@
 	<script type="text/javascript" src="./javascripts/compositeAdmin.js"></script>
 	<script type="text/javascript" src="./javascripts/topology.js"></script>
     <script src="./javascripts/optionalFields.js"></script>
-	<script> var topology = getTopology();
+	<script>
 	containedList = new Array();
 	currentComposite = "";
 	tableToJqueryDataTable ([],[{"sTitle":"Name"},{"sTitle":"Description"},{"sTitle":"Actions"}],'containedSensorTable');
 	tableToJqueryDataTable ([],[{"sTitle":"Name"},{"sTitle":"Description"},{"sTitle":"Actions"}],'sensorTable');
-	getAllComposite(getURL(topology,"registry","/registry/composite/sensors")+"?flatten=true","compositeTable","containedSensorTable","sensorTable");
+	getAllComposite(getURL(getTopology(),"registry","/registry/composite/sensors")+"?flatten=true","compositeTable","containedSensorTable","sensorTable");
 	 $(document).ready(function () {
 		$("[rel=tooltip]").tooltip({placement:'left'});
 	});

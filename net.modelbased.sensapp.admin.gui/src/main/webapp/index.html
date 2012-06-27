@@ -162,8 +162,8 @@
 		<i>* Mandatory</i>      
 </div> 
 <div class="modal-footer">
-<a href="#" class="btn" onclick="addEvent('add-Sensor','addTag','theValue');"><div class="icon-plus"></div>&nbsp;Custom Field</a>
-<a href="#" class="btn btn-primary" onClick="registerSensor(topology,'add-form','dataTable');" data-dismiss="modal">Register</a>  
+<a href="#" class="btn" onclick="addEvent('add-Sensor','addNonExistingTag','theValue');"><div class="icon-plus"></div>&nbsp;Custom Field</a>
+<a href="#" class="btn btn-primary" onClick="registerSensor('add-form','dataTable');" data-dismiss="modal">Register</a>  
 <a href="#" class="btn" onClick="clearAddModal('add-Sensor')" data-dismiss="modal">Close</a>  
 </div>  
 </div>  	
@@ -212,8 +212,8 @@
 		</table>
 </div> 
 <div class="modal-footer">  
-<a href="#" class="btn" onclick="addEvent('edit-Sensor','editTag','theValue');"><div class="icon-plus"></div>&nbsp;Custom Field</a>
-<a href="#" class="btn btn-primary" onclick="updateSensor($('#edit-Sensor').find('#id').attr('value'),topology,'edit-Sensor','dataTable');" data-dismiss="modal">Update</a>  
+<a href="#" class="btn" onclick="addEvent('edit-Sensor','editNonExistingTag','theValue');"><div class="icon-plus"></div>&nbsp;Custom Field</a>
+<a href="#" class="btn btn-primary" onclick="updateSensor($('#edit-Sensor').find('#id').attr('value'),'edit-Sensor','dataTable');" data-dismiss="modal">Update</a>  
 <a href="#" class="btn" onclick="clearEditModal('edit-Sensor')" data-dismiss="modal">Close</a>  
 </div>
 </div> 
@@ -241,8 +241,8 @@
 	<script type="text/javascript" src="./javascripts/topology.js"></script>
     <script src="./javascripts/optionalFields.js"></script>
 	<script type="text/javascript" charset="utf-8" language="javascript" src="bootstrap/js/DT_bootstrap.js"></script>
-	<script> var topology = getTopology();
-	getAllSensors(getURL(topology,"registry","/registry/sensors")+"?flatten=true",topology,"dataTable");
+	<script>
+	getAllSensors(getURL(getTopology(),"registry","/registry/sensors")+"?flatten=true","dataTable");
 	 $(document).ready(function () {
 		$("[rel=tooltip]").tooltip({placement:'left'});
 	});
