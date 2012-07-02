@@ -44,15 +44,7 @@ function updateProgress (evt) {
     }
   }
 
-
-
-function showAlert(tagName, innerHTML) {
-    var elm;
-    elm = document.createElement(tagName);
-    elm.innerHTML = innerHTML;
-    document.body.appendChild(elm);
-}
-
+ //put readed file to SensApp
 function putToSensApp (targetURL,senmlString) {
 
 	$.ajax({

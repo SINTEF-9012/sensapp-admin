@@ -71,17 +71,12 @@ function separateNotifiers(targetURL,allSensors,notifierTable,nonNotifierTable) 
 //**********************************
 
 function registerNotifier(sensorName,row,notifierTable,nonNotifierTable) {
-	var postData = getNotifierToPost(sensorName);
-	postNotifier(getURL(getTopology(),"notifier","/notification/registered"),postData,row,notifierTable,nonNotifierTable);
-}
-
-function postNotifier(targetURL,postData,row,notifierTable,nonNotifierTable) {
 
 	$.ajax({
 		type: "post",
-		url: targetURL,
+		url: getURL(getTopology(),"notifier","/notification/registered"),
 		contentType: "application/json",
-		data: JSON.stringify(postData),
+		data: JSON.stringify(getNotifierToPost(sensorName)),
 		success: function (data,textStatus,jqXHR) {
 			addToNotifierTableById(getURL(getTopology(),"registry","/registry/sensors/"+postData.sensor),row,notifierTable,nonNotifierTable);
 		},
@@ -111,7 +106,6 @@ function addToNonNotifierTableById(targetURL,row,notifierTable,nonNotifierTable)
 				alertMessage("error",errorThrown,5000);
 			}
 	});
- 
 }
 
 function createNonNotifierActions(sensor) {
@@ -218,6 +212,7 @@ function getDeleteInfos (sensorId,row,modalDiv,notifierTable,nonNotifierTable) {
 // Hooks Admin Functions
 //**********************************
 
+//Init Modal
 function getHookList(targetURL,hookModal) {
 
 	$.ajax({
@@ -269,11 +264,13 @@ function clearHookModal(modalDiv) {
 
 function registerHooks(modalDiv,sensorId) {
 
+	//get the hooks to put
 	var hookList = new Array();
 	$.each($("#"+modalDiv).find('table>tbody>tr>td:nth-child(1)'),function (i,hook) {
 		hookList.push(hook.innerHTML);
 	});
 
+	//put the hooks
 	$.ajax({
 		type: "put",
 		contentType: "application/json",

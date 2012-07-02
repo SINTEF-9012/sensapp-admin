@@ -1,9 +1,9 @@
+//return the current stored topology, are default if null
 function getTopology() {
 	if(localStorage.getItem("topology")!=null) {
 		return eval('(' + localStorage.getItem("topology") + ')');
 	}
 	else {
-	
 		topology = 	{		
 		  "nodes": [{ "name": "local", "srv": "", "port": "" }],
 		  "deployment": [
@@ -13,12 +13,11 @@ function getTopology() {
 			{ "service": "registry",     "node": "local" }
 		  ]
 		};
-	
 		return  topology;
-
 	}
 }
 
+//return the URL of the given service
 function getURL(topology,partner,path) {
 
 	function getObjects(obj, key, val) {
@@ -40,11 +39,11 @@ function getURL(topology,partner,path) {
 		item = getObjects(topology["nodes"],"name",node);
 		
 		if(item[0].srv!="" && item[0].port!="")
-			return "http://"+item[0].srv+":"+item[0].port+path;
+			return "http://"+item[0].srv+":"+item[0].port+"/sensapp"+path;
 		else
-			return path;
+			return  "/sensapp"+path;
 	}
 	else {
-		return path;
+		return "/sensapp"+path;
 	}
 }

@@ -1,3 +1,4 @@
+//get the sensor to display
 function getSensor (targetURL) {
 	$.ajax({
 		type: "get",
@@ -18,6 +19,7 @@ function getSensor (targetURL) {
 	});
 }
 
+//recursive json displayer
 function displayArray (data) {
 	display += "<div style='margin-left: 2em;'>[";
 	$.each(data,function(i,element) {

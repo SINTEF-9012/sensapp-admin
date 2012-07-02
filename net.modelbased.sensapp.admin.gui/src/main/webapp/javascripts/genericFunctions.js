@@ -13,6 +13,7 @@ function timeStampToDate (timestamp) {
 
 }
 
+//Add Link to Raw Data
 function createNameColumn(sensorId,type) {
 	return $(document.createElement('div'))
 			.append(
@@ -25,6 +26,7 @@ function createNameColumn(sensorId,type) {
 			);
 }
 
+//Insert Tags in Description
 function createDescriptionColumn(sensor,type) {
 
 	var popoverContent;
@@ -61,38 +63,7 @@ function createDescriptionColumn(sensor,type) {
 		return $(document.createElement('div')).append(text);
 }
 
-function alertMessage(type,message,timeout) {
-	alertDiv = $(document.createElement('div'));
-			
-	switch (type) {
-		case "success":
-			alertDiv.attr("class","alert alert-success fade in")
-					.html("<b>Success.</b> "+message);
-			break;
-		case "error":
-			alertDiv.attr("class","alert alert-error fade in")
-					.html("<b>Error.</b> "+message);
-			break;
-		case "warning":
-			alertDiv.attr("class","alert fade in")
-					.html("<b>Warning.</b> "+message);
-			break;
-		default:
-			break;
-	}
-	
-	alertDiv.append(
-			$(document.createElement('a'))
-				.attr("class","close")
-				.attr("data-dismiss","alert")
-				.html("&times;")
-		);
-	
-	$('#alert-div').append(alertDiv);
-	if(typeof timeout!='undefined')
-		window.setTimeout(function() { $('#alert-div').find(':contains('+message+')').remove(); }, timeout);
-}
-
+//Create the popover content
 function getPopoverContent(sensor) {
 	var popoverContent = "";
 	if(sensor.infos.update_time!=null) {
@@ -127,15 +98,51 @@ function getCompositePopoverContent(sensor) {
 	return popoverContent;
 }
 
+//Alert Messages
+function alertMessage(type,message,timeout) {
+	alertDiv = $(document.createElement('div'));
+			
+	switch (type) {
+		case "success":
+			alertDiv.attr("class","alert alert-success fade in")
+					.html("<b>Success.</b> "+message);
+			break;
+		case "error":
+			alertDiv.attr("class","alert alert-error fade in")
+					.html("<b>Error.</b> "+message);
+			break;
+		case "warning":
+			alertDiv.attr("class","alert fade in")
+					.html("<b>Warning.</b> "+message);
+			break;
+		default:
+			break;
+	}
+	
+	alertDiv.append(
+			$(document.createElement('a'))
+				.attr("class","close")
+				.attr("data-dismiss","alert")
+				.html("&times;")
+		);
+	
+	$('#alert-div').append(alertDiv);
+	if(typeof timeout!='undefined')
+		window.setTimeout(function() { $('#alert-div').find(':contains('+message+')').remove(); }, timeout);
+}
+
+//generic remove Datatable Row
 function removeRow(row,dataTable) {
 	var oTable = $('#'+dataTable).dataTable();
 	oTable.fnDeleteRow(oTable.fnGetPosition(row));
  }
  
+//Resize the table
  function resizeDatatable(table) {
 	$('#'+table).dataTable().fnAdjustColumnSizing();
 }
 
+//Make a Boostrap style Datatable
 function tableToJqueryDataTable (data,columns,div,sorting) {
 
 			if(typeof sorting == 'undefined') {

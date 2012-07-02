@@ -3,14 +3,13 @@
 <link rel="stylesheet" type="text/css" href="bootstrap/css/DT_bootstrap.css">
 
 <html lang="en">
-  <head>
+<head>
 	<script src="http://code.jquery.com/jquery-latest.js"></script>
     <meta charset="utf-8">
     <title>SensApp</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <!-- Le styles -->
     <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
     <style type="text/css">
       body {
@@ -22,15 +21,12 @@
       }
     </style>
     <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+</head>
 
-    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-
-  <body>
-
+<body>
+<!---------------------
+-NavBarDiv div--
+---------------------->	
     <div class="navbar-fixed-top">
 		<div class="navbar">
 			<div class="navbar-inner">
@@ -73,36 +69,37 @@
 			</div>
 		</div>
 	</div>
-
+<!---------------------
+-Alert div--
+---------------------->	
 	<div class="span4 offset4" id="alert-div" style="position:fixed;width:40%;margin-top:10px;"></div>
-
-
+<!---------------------
+-Main div--
+---------------------->	
 	<div id="reset-all" class="container hero-unit" style="text-align:center">
 		<a href="#reset-Sensapp" data-toggle="modal"  class="btn btn-danger btn-large" style="font-size:48px"><b>Reset SensApp</b></a>
 		<h2>Caution ! Reset SensApp will make you lose all your data</h2>
 	</div>
-
 	
 <!---------------------
--Add Sensor Modal div--
+-reset Modal div--
 ---------------------->	
 <div id="reset-Sensapp" class="modal hide fade in" style="display: none; ">  
-<div class="modal-header">  
-<a class="close" onClick="clearAddModal('add-Sensor')"  data-dismiss="modal">&times;</a>  
-<h2>Are you sure you want reset SensApp ?</h2>
-</div> 
-<div class="modal-body">  
-<b style="font-size:14px">Write "yes" to continue :</b> <input id="confirmation" type="text" class="input-medium search-query">
+	<div class="modal-header">  
+		<a class="close" onClick="clearAddModal('add-Sensor')"  data-dismiss="modal">&times;</a>  
+		<h2>Are you sure you want reset SensApp ?</h2>
+	</div> 
+	<div class="modal-body">  
+		<b style="font-size:14px">Write "yes" to continue :</b> <input id="confirmation" type="text" class="input-medium search-query">
+	</div>  
+	<div class="modal-footer">
+		<a href="#" class="btn btn-danger" onClick="if($('#confirmation').val()=='yes'){reset()}" data-dismiss="modal">Reset</a>  
+		<a href="#" class="btn" data-dismiss="modal">Close</a>  
+	</div>  
 </div>  
-<div class="modal-footer">
-<a href="#" class="btn btn-danger" onClick="if($('#confirmation').val()=='yes'){reset()}" data-dismiss="modal">Reset</a>  
-<a href="#" class="btn" data-dismiss="modal">Close</a>  
-</div>  
-</div>  
-
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
+<!---------------------
+-Scripts--
+---------------------->	
 	<script type="text/javascript" src="./javascripts/topology.js"></script>
 	<script type="text/javascript" src="./javascripts/reset.js"></script>
 	<script type="text/javascript" src="./javascripts/genericFunctions.js"></script>	
@@ -118,5 +115,5 @@
     <script src="bootstrap/js/bootstrap-collapse.js"></script>
     <script src="bootstrap/js/bootstrap-carousel.js"></script>
     <script src="bootstrap/js/bootstrap-typeahead.js"></script>
- </body>
+</body>
 </html>

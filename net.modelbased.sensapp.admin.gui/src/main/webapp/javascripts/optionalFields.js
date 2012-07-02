@@ -1,3 +1,4 @@
+//Make a form field for sensors/composites.
 function addEvent(div,elementNames,refValue) {
 	
 	$('#'+refValue).attr('value',$('#'+refValue).attr('value') + 1);

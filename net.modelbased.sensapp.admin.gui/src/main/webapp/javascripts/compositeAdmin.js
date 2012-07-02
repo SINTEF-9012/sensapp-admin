@@ -1,3 +1,4 @@
+//Called When Compsite Selected
 function getCompositeInformations(targetURL,compositeId,containedTable,sensorTable) {
 
 	$.ajax({
@@ -27,13 +28,13 @@ function separateContained(targetURL,allSensorsURL,containedTable,sensorTable) {
 			function (compositeInfos, textStatus, jqXHR) {
 				var containedArray = new Array();
 				var othersArray = new Array();		
-				$.each(allSensorsURL, function (i,sensor) {
-					if(compositeInfos.sensors.indexOf(sensor)==-1) {
-						getPushOtherSensorInfos(getURL(getTopology(),"registry",sensor),othersArray,containedTable,sensorTable);
+				$.each(allSensorsURL, function (i,sensorURL) {
+					if(compositeInfos.sensors.indexOf(sensorURL)==-1) {
+						getPushOtherSensorInfos(sensorURL,othersArray,containedTable,sensorTable);						
 					}
 					else {
 						containedList = compositeInfos.sensors;
-						getPushContainedSensorInfos(getURL(getTopology(),"registry",sensor),containedArray,containedTable,sensorTable);
+						getPushContainedSensorInfos(sensorURL,containedArray,containedTable,sensorTable);
 					}
 				});
 				$('#'+containedTable).dataTable().fnClearTable();
@@ -78,7 +79,7 @@ function getPushContainedSensorInfos(targetURL,containedArray,containedTable,sen
 		dataType:'json',
 		success: 
 			function (sensor, textStatus, jqXHR) {
-				addRowToContainedDataTable (sensor,containedTable,sensorTable)
+				addRowToContainedDataTable (sensor,containedTable,sensorTable);
 			},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
@@ -92,6 +93,7 @@ function getPushContainedSensorInfos(targetURL,containedArray,containedTable,sen
 // Composite Table Functions
 //**********************************
 
+//Init Main Page
 function getAllComposite(targetURL,compositeTable,containedTable,sensorTable) {
 	
 	$.ajax({
@@ -136,7 +138,7 @@ function createCompositeActions(sensor,compositeTable,containedTable,sensorTable
 			)
 			.append(' ')
 			.append(
-				//
+				//Edit Button
 				$(document.createElement('a'))
 					.attr("class","btn")
 					.attr("href","#edit-Composite")
@@ -447,6 +449,7 @@ function editComposite(modalDiv,tableDiv) {
 		data: JSON.stringify(getTags(modalDiv)),
 		success: 
 			function (data, textStatus, jqXHR) {
+				//waiting for sensApp updates
 				//updateSensorDescr(targetURL,modalDiv,tableDiv);
 				clearEditModal(modalDiv);
 				alertMessage("success","Information Updated",5000);
