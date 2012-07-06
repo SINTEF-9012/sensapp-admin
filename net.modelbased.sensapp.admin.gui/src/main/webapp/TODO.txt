@@ -4,7 +4,6 @@ Visualisation/Sensor
   - utiliser un tag "default_widget" pour spécifier quel widget graphique utiliser pour un capteur
 
     - (un bouton "configure" pour slectioner ces paramètres)
-    - bouton refresh sur les visualisation
 
 - Visualisation/Composite
 

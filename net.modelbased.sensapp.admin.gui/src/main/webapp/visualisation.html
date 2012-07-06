@@ -22,11 +22,6 @@
       }
     </style>
     <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-
-    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
 </head>
 
 <body>
@@ -60,7 +55,7 @@
 								<ul class="dropdown-menu">
 								<li><a href="#" class="active">Sensors</a></li>     
 								<li><a href="#">Composites</a></li> 
-								<li><a href="#">Dashboard</a></li>  
+								<li><a href="dashboard.html">Dashboard</a></li>  
 								</ul>  
 							</li>
 						</ul>
@@ -134,7 +129,7 @@
 	<script src="./highstock/js/modules/exporting.js"></script>	
 	<script>
 	jsonRawData = new Array();
-	getAllSensorsForVisu(getURL(getTopology(),"registry","/registry/sensors")+"?flatten=true","sensorTable");
+	getAllSensorsForVisu(getURL(getTopology(),"registry","/sensapp/registry/sensors")+"?flatten=true","sensorTable");
 	tableToJqueryDataTable([],[{"sTitle":"Time"},{"sTitle":"Value"}],$('#rawDataTableDiv').find('table').attr('id'),'desc');
 	$(document).ready(function () {
 		$("[rel=tooltip]").tooltip({placement:'top'});

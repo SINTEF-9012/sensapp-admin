@@ -3,7 +3,7 @@
 //**********************************
 
 //Init function
-function getAllSensors (targetURL,div) {
+function getAllSensors (targetURL,table) {
 	$.ajax({
 		type: "get",
 		url: targetURL,
@@ -12,7 +12,7 @@ function getAllSensors (targetURL,div) {
 		success: 
 			function (data, textStatus, jqXHR) {
 				if (data.length!=0) {
-					displayAllSensors(data,div);
+					displayAllSensors(data,table);
 				}
 			},
 		error: 
@@ -52,7 +52,7 @@ function createSensorActions(sensor) {
 			//Edit Button
 			$(document.createElement('a'))
 				.attr("href","#edit-Sensor")
-				.attr("onclick","getMoreInputInfos(getURL(getTopology(),'registry','/registry/sensors/"+sensor.id+"'),'edit-Sensor')")
+				.attr("onclick","getMoreInputInfos(getURL(getTopology(),'registry','/sensapp/registry/sensors/"+sensor.id+"'),'edit-Sensor')")
 				.attr("data-toggle","modal")
 				.attr("class","btn")
 				.text("Edit")
@@ -76,7 +76,7 @@ function createSensorActions(sensor) {
 function registerSensor(formDiv,tableDiv) {
 
 	var postData = getSensorToPost(formDiv);
-	var targetURL = getURL(getTopology(),"registry","/registry/sensors")
+	var targetURL = getURL(getTopology(),"registry","/sensapp/registry/sensors")
 	
 	$.ajax({
 		type: "post",
@@ -150,7 +150,7 @@ function updateSensor(id,formDiv,tableDiv) {
 		success: 
 			function (data, textStatus, jqXHR) {
 				//udpate description too
-				updateSensorDescr(getURL(getTopology(),"registry","/registry/sensors/"+id),getJSONDescr(formDiv),tableDiv);
+				updateSensorDescr(getURL(getTopology(),"registry","/sensapp/registry/sensors/"+id),getJSONDescr(formDiv),tableDiv);
 
 			},
 		error: function (jqXHR, textStatus, errorThrown) {
@@ -265,7 +265,7 @@ function clearEditModal(div) {
 function getDeleteInfos(sensorId,row,modalDiv,table) {
 	$('#'+modalDiv).find('h2').text("Delete " + sensorId + " ?");
 	$('#'+modalDiv).find('#delete').unbind('click').click( function () {
-		deleteSensor(getURL(getTopology(),'registry','/registry/sensors/'+sensorId),row,table);
+		deleteSensor(getURL(getTopology(),'registry','/sensapp/registry/sensors/'+sensorId),row,table);
 	});
 }
 

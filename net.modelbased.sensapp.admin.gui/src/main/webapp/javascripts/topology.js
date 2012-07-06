@@ -37,13 +37,12 @@ function getURL(topology,partner,path) {
 		var item = getObjects(topology["deployment"],"service",partner);
 		var node = item[0].node;
 		item = getObjects(topology["nodes"],"name",node);
-		
 		if(item[0].srv!="" && item[0].port!="")
-			return "http://"+item[0].srv+":"+item[0].port+"/sensapp"+path;
+			return "http://"+item[0].srv+":"+item[0].port+path;
 		else
-			return  "/sensapp"+path;
+			return  path;
 	}
 	else {
-		return "/sensapp"+path;
+		return path;
 	}
 }

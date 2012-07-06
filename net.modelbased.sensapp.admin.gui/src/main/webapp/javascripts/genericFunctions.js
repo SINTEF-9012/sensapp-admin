@@ -258,3 +258,59 @@ function tableToJqueryDataTable (data,columns,div,sorting) {
 		}).$("div[rel=popover]").popover({placement:'right'});
 	});
 }
+
+//*********************************
+// Raw Data Transformation
+//*********************************
+
+function SenMLToHighcharts(senMLData) {
+	var highchartsData = new Array();
+	if(typeof senMLData.e[0].v!='undefined') {
+		if(typeof senMLData.bt=='undefined') {
+			$.each(senMLData.e, function (i,element) {
+					highchartsData.push([element.t*1000,element.v]);			
+			});
+		}
+		else {
+			$.each(senMLData.e, function (i,element) {
+					highchartsData.push([(element.t+senMLData.bt)*1000,element.v]);		
+			});
+		}
+	} else {
+		if(typeof senMLData.e[0].bv!='undefined') {
+			if(typeof senMLData.bt=='undefined') {
+				$.each(senMLData.e, function (i,element) {
+					var val;
+					if(element.bv) {
+						val=1;
+					}
+					else {
+						val=0;
+					}					
+					highchartsData.push([element.t*1000,val]);			
+			});
+		}
+			else {
+				$.each(senMLData.e, function (i,element) {
+					var val;
+					if(element.bv) {
+						val=1;
+					}
+					else {
+						val=0;
+					}					
+					highchartsData.push([(element.t+senMLData.bt)*1000,val]);			
+				});
+			}
+		}
+	}
+	//highchartsData.sort(sortByTime);
+
+	return highchartsData;
+}
+
+function sortByTime(a, b){
+  var aTime = a[0];
+  var bTime = b[0]; 
+  return ((aTime < bTime) ? -1 : ((aTime > bTime) ? 1 : 0));
+}

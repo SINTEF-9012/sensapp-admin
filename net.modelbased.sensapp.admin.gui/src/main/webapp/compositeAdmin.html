@@ -56,7 +56,7 @@
 								<ul class="dropdown-menu">
 									<li><a href="visualisation.html">Sensors</a></li>     
 									<li><a href="#">Composites</a></li> 
-									<li><a href="#">Dashboard</a></li>  
+									<li><a href="dashboard.html">Dashboard</a></li>  
 								</ul>  
 							</li>
 						</ul>
@@ -193,7 +193,7 @@
 		</div> 
 		<div class="modal-footer">
 			<a href="#" class="btn" onclick="addEvent('edit-Composite','editNonExistingTag','theValue');"><div class="icon-plus"></div>&nbsp;Custom Field</a>
-			<a href="#" class="btn btn-primary" onclick="editComposite('edit-Composite')" data-dismiss="modal">Register</a>  
+			<a href="#" class="btn btn-primary" onclick="editComposite('edit-Composite','compositeTable')" data-dismiss="modal">Register</a>  
 			<a href="#" class="btn" onClick="clearEditModal('edit-Composite')" data-dismiss="modal">Close</a>  
 		</div>  
 	</div> 
@@ -228,7 +228,7 @@
 		currentComposite = "";
 		tableToJqueryDataTable ([],[{"sTitle":"Name"},{"sTitle":"Description"},{"sTitle":"Actions"}],'containedSensorTable');
 		tableToJqueryDataTable ([],[{"sTitle":"Name"},{"sTitle":"Description"},{"sTitle":"Actions"}],'sensorTable');
-		getAllComposite(getURL(getTopology(),"registry","/registry/composite/sensors")+"?flatten=true","compositeTable","containedSensorTable","sensorTable");
+		getAllComposite(getURL(getTopology(),"registry","/sensapp/registry/composite/sensors")+"?flatten=true","compositeTable","containedSensorTable","sensorTable");
 		$(document).ready(function () {
 			$("[rel=tooltip]").tooltip({placement:'left'});
 		});

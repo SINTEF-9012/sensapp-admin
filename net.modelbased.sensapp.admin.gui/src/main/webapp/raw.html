@@ -20,13 +20,13 @@
 	<script type="text/javascript">
 		switch (getQuerystring("type")) {
 			case "sensor":
-				getSensor(getURL(getTopology(),"registry","/registry/sensors/"+getQuerystring("sensor")));
+				getSensor(getURL(getTopology(),"registry","/sensapp/registry/sensors/"+getQuerystring("sensor")));
 				break;
 			case "composite":
-				getSensor(getURL(getTopology(),"registry","/registry/composite/sensors/"+getQuerystring("sensor")));
+				getSensor(getURL(getTopology(),"registry","/sensapp/registry/composite/sensors/"+getQuerystring("sensor")));
 				break;
 			case "notifier":
-				getSensor(getURL(getTopology(),"notifier","/notification/registered/"+getQuerystring("sensor")));		
+				getSensor(getURL(getTopology(),"notifier","/sensapp/notification/registered/"+getQuerystring("sensor")));		
 			default:
 				break;
 		}

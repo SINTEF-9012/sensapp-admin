@@ -11,7 +11,7 @@ function getNotificationInformations(targetURL,notifierDiv,nonNotifierDiv) {
 		dataType:'json',
 		success: 
 			function (allSensors, textStatus, jqXHR) {
-				separateNotifiers(getURL(getTopology(),"notifier","/notification/registered?flatten=true"),allSensors,notifierDiv,nonNotifierDiv);	
+				separateNotifiers(getURL(getTopology(),"notifier","/sensapp/notification/registered?flatten=true"),allSensors,notifierDiv,nonNotifierDiv);	
 			},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
@@ -78,7 +78,7 @@ function registerNotifier(sensorName,row,notifierTable,nonNotifierTable) {
 		contentType: "application/json",
 		data: JSON.stringify(getNotifierToPost(sensorName)),
 		success: function (data,textStatus,jqXHR) {
-			addToNotifierTableById(getURL(getTopology(),"registry","/registry/sensors/"+postData.sensor),row,notifierTable,nonNotifierTable);
+			addToNotifierTableById(getURL(getTopology(),"registry","/sensapp/registry/sensors/"+postData.sensor),row,notifierTable,nonNotifierTable);
 		},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
@@ -138,7 +138,7 @@ function deleteNotifier(targetURL,sensorId,row,notifierTable,nonNotifierTable) {
 		url: targetURL,
 		success: 
 			function (data, textStatus, jqXHR) {
-				addToNonNotifierTableById(getURL(getTopology(),"registry","/registry/sensors/"+sensorId),row,notifierTable,nonNotifierTable);
+				addToNonNotifierTableById(getURL(getTopology(),"registry","/sensapp/registry/sensors/"+sensorId),row,notifierTable,nonNotifierTable);
 			},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
@@ -185,7 +185,7 @@ function createNotifierActions(sensor,notifierTable,nonNotifierTable) {
 				.attr("id",sensor.id+"-Hooks")
 				.attr("href","#hook-Modal")
 				.attr("data-toggle","modal")
-				.attr("onclick","getHookList(getURL(getTopology(),'notifier','/notification/registered/"+sensor.id+"'),'hook-Modal')")
+				.attr("onclick","getHookList(getURL(getTopology(),'notifier','/sensapp/notification/registered/"+sensor.id+"'),'hook-Modal')")
 				.text("Manage Hooks")
 		)
 		.append(' ')
@@ -203,7 +203,7 @@ function createNotifierActions(sensor,notifierTable,nonNotifierTable) {
 function getDeleteInfos (sensorId,row,modalDiv,notifierTable,nonNotifierTable) {
 	$('#'+modalDiv).find('h2').text("Delete " + sensorId + " ?");
 	$('#'+modalDiv).find('#delete').unbind('click').click( function () {
-			deleteNotifier(getURL(getTopology(),'notifier','/notification/registered/'+sensorId),sensorId,row,notifierTable,nonNotifierTable);
+			deleteNotifier(getURL(getTopology(),'notifier','/sensapp/notification/registered/'+sensorId),sensorId,row,notifierTable,nonNotifierTable);
 	});
 }
 
@@ -275,7 +275,7 @@ function registerHooks(modalDiv,sensorId) {
 		type: "put",
 		contentType: "application/json",
 		async:false,
-		url: getURL(getTopology(),"notifier","/notification/registered/"+sensorId),
+		url: getURL(getTopology(),"notifier","/sensapp/notification/registered/"+sensorId),
 		data: JSON.stringify({"sensor":sensorId,"hooks":hookList}),
 		success: 
 			function (data, textStatus, jqXHR) {
