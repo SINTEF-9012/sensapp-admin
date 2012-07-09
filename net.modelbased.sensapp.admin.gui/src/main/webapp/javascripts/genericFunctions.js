@@ -18,6 +18,7 @@ function createNameColumn(sensorId,type) {
 	return $(document.createElement('div'))
 			.append(
 				$(document.createElement('a'))
+					.attr("id",sensorId)
 					.attr("rel","tooltip")
 					.attr("title","View raw data")
 					.attr("href","raw.html?sensor="+sensorId+"&type="+type)

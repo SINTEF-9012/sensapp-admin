@@ -2,6 +2,11 @@ function addVisualisation(formDiv,visuDiv,sensorDiv) {
 	addVisualisationToDataTable($('#'+formDiv).find('#id').val(),$('#'+formDiv).find('#type').val(),visuDiv,sensorDiv);
 }
 
+function clearVisualisationModal(div) {
+	$('#'+div).find('#id').attr("value","");
+	$('#'+div).find('#type').val("table");
+}
+
 function addVisualisationToDataTable(visu,type,visuDiv,sensorDiv) {
 
 	nameDiv = $(document.createElement('div')).append(
@@ -52,7 +57,7 @@ function showSensors(visuName,type,visuDiv,sensorDiv) {
 	$('#'+sensorDiv).show();
 	switch (type) {
 		case "table":
-			setRadioSelection(visuName,visuDiv,sensorDiv);
+			setMutltipleSelection(visuName,visuDiv,sensorDiv);
 			break;
 		case "chart":
 			setMutltipleSelection(visuName,visuDiv,sensorDiv);
@@ -62,6 +67,7 @@ function showSensors(visuName,type,visuDiv,sensorDiv) {
 	}
 }
 
+//currently useless, but can be used
 function setRadioSelection(visuName,visuDiv,sensorDiv) {
 	
 	var oTable=$('#'+sensorDiv).find('table').dataTable();
@@ -113,7 +119,7 @@ function setMutltipleSelection(visuName,visuDiv,sensorDiv) {
 	//set Register Function
 	$('#'+sensorDiv).find('#register').unbind('click').click(function () {
 		var sensorListColId = $('#'+visuDiv).find("th:contains('Sensors')").index();
-		var visuRowId = $('#'+visuDiv).find("tr").has("td:contains('"+visuName+"')").index();
+		var visuRowId = $('#'+visuDiv).find("tr").has("span[id="+visuName+"]").index();
 
 		$('#'+visuDiv).find("tbody").find('tr').eq(visuRowId).find('td').eq(sensorListColId).empty();
 		if($('#'+sensorDiv).find('tr.row_selected').size()>0) {
@@ -125,15 +131,15 @@ function setMutltipleSelection(visuName,visuDiv,sensorDiv) {
 		$('#'+visuDiv).show();
 		$('#'+sensorDiv).hide();
 		aSelected=[];
+		$('#'+sensorDiv).find('table').dataTable().$('.row_selected').toggleClass('row_selected');
 	});
 }
-
-//Displays a sensor Table with radio selection (for Table visu)
+//Displays  sensor Table
 function getAllSensors (sensorDiv) {
 
 	$.ajax({
 		type: "get",
-		url: getURL(getTopology(),"registry","/registry/sensors?flatten=true"),
+		url: getURL(getTopology(),"registry","/sensapp/registry/sensors?flatten=true"),
 		contentType: "application/json",
 		dataType:'json',
 		success: 
@@ -159,115 +165,136 @@ function getAllSensors (sensorDiv) {
 }
 
 
-function generate(visuDiv) {
+function generate(visuDiv,displayDiv) {
 
-	if(initDashboard!='undefined') {
+	$('#'+visuDiv).hide();
+	$('#'+displayDiv).empty();
 		var nameColId = $('#'+visuDiv).find('table').find("th:contains('Name')").index();
 		var typeColId = $('#'+visuDiv).find('table').find("th:contains('Type')").index();
 		var sensorsColId = $('#'+visuDiv).find('table').find("th:contains('Sensors')").index();
-		var tmpDashboard=new Array();	
 
 		$.each($('#'+visuDiv).find('table tbody tr'), function (i,row) {
 			var visuName = $(row).find('td').eq(nameColId).text();
 			var visuType = $(row).find('td').eq(typeColId).text();
-			tmpDashboard.push({"visualisation":visuName,"type":visuType,sensors:[]});
-			
+			var sensors = new Array();	
+	
 			switch (visuType) {
 				case "table":
-					tmpDashboard[i].sensors = $(row).find('td').eq(sensorsColId).find('div')[0].innerHTML;
-					generateTable(visuName,$(row).find('td').eq(sensorsColId).find('div')[0].innerHTML);
-					break;
-				case "chart":
-					var sensors = new Array();
 					$.each($(row).find('td').eq(sensorsColId).find('div'),function(i,div) {
 						sensors.push(div.innerHTML);
 					});
-					tmpDashboard[i].sensors = sensors;
-					generateChart(visuName,sensors);
+					generateTable(visuName,sensors,displayDiv);
+					break;
+				case "chart":
+					$.each($(row).find('td').eq(sensorsColId).find('div'),function(i,div) {
+						sensors.push(div.innerHTML);
+					});
+					generateChart(visuName,sensors,displayDiv);
 					break;
 				default:
 					break;
 			}
-
 		});
-	}
-	else {
-		$.each(initDashboard, function (i,visualisation) {
-				var visuName = visualisation.name
-				var visuType = visualisation.type
-				switch (visuType) {
-					case "table":
-						generateTable(visuName,visualisation.sensors);
-						break;
-					case "chart":
-						generateChart(visuName,visualisation.sensors);
-						break;
-					default:
-						break;
-				}
-			});
-	}
 }
 
-function generateTable (visuName,sensor) {
-	$.ajax({
-		type: "get",
-		url: getURL(getTopology(),"registry","/registry/sensors/"+sensor),
-		contentType: "application/json",
-		dataType:'json',
-		success: 
-			function (sensorsInfos, textStatus, jqXHR) {
-				getSensorTableData(visuName,sensorsInfos);
-			},
-		error: 
-		function (jqXHR, textStatus, errorThrown) {
-			alertMessage("error",errorThrown,5000);
-		}
-	});	
-}
 
-function getSensorTableData (visuName,sensorsInfos) {
+function generateTable (visuName,sensors,displayDiv) {
 
-	$.ajax({
-		type: "get",
-		url: getURL(getTopology(),"database."+sensorsInfos.backend.kind,sensorsInfos.backend.dataset),
-		contentType: "application/json",
-		dataType:'json',
-		success: 
-			function (data, textStatus, jqXHR) {
-				var dataColumns = [{"sTitle":"Time"},{"sTitle":"Value"}];
-				//create the table
-				var newTable = 
-				$(document.createElement('table'))
-					.attr("id",visuName)
-					.attr("class","table table-striped table-bordered")
-					.attr("cellpadding","0")
-					.attr("cellspacing","0")
-					.attr("border","0")
-					.append(
-						$(document.createElement('thead'))
-							.append(
-								$(document.createElement('tr'))
-									.append(
-										$(document.createElement('th'))
-											.text("Time"))
-									.append(
-										$(document.createElement('th'))
-											.text("Value")))
-					.append(
-						$(document.createElement('tbody')))
-				);
-				$('#display').append($(document.createElement('div')).append(newTable));
-				tableToJqueryDataTable (getDataArray(data),dataColumns,visuName);
-			},
-		error: 
+	var sensorCounter = 0
+	
+	$.each(sensors,function (i,sensor) {
+		$.ajax({
+			type: "get",
+			url: getURL(getTopology(),"registry","/sensapp/registry/sensors/"+sensor),
+			contentType: "application/json",
+			dataType:'json',
+			success: 
+				function (sensorsInfos, textStatus, jqXHR) {
+					getSensorTableData(visuName,sensorsInfos,displayDiv);
+				},
+			error: 
 			function (jqXHR, textStatus, errorThrown) {
 				alertMessage("error",errorThrown,5000);
 			}
-	});	
+		});	
+	});
+	
+	function getSensorTableData (visuName,sensorsInfos,displayDiv) {
+
+		var senMLArray = [];
+	
+		$.ajax({
+			type: "get",
+			url: sensorsInfos.backend.dataset,
+			contentType: "application/json",
+			dataType:'json',
+			success: 
+				function (data, textStatus, jqXHR) {
+					sensorCounter++;
+					senMLArray.push(data);
+					if (sensorCounter==sensors.length) {
+						createTable(senMLArray,visuName,displayDiv);
+					}
+				},
+			error: 
+				function (jqXHR, textStatus, errorThrown) {
+					alertMessage("error",errorThrown,5000);
+				}
+		});	
+	}
+	
+	function createTable(senMLArray,visuName,displayDiv) {
+
+		var dataArray = [];
+		var titles = [{"sTitle":"Time"}];
+		var headers = $(document.createElement('tr')).append($(document.createElement('th')).text("Time"));
+	
+		$.each(senMLArray,function(i,senML) {
+			titles.push({"sTitle":senML.bn});
+			headers.append($(document.createElement('th')).text(senML.bn));
+			alert(JSON.stringify(dataArray));
+				$.each(senML.e, function(j,element) {
+					if(typeof dataArray[(senML.t+senML.bt)+""]=="undefined") {
+						dataArray[(element.t+senML.bt)+""]=[];
+						dataArray[(element.t+senML.bt)+""][0]=element.t+senML.bt;
+						for(var j=1;j<i+1;j++) {					
+							dataArray[(element.t+senML.bt)+""][j]="-";
+						}
+						dataArray[(element.t+senML.bt)+""][i+1]=element.v;
+						for(var j=i+2;j<senMLArray.length+1;j++) {					
+							dataArray[(element.t+senML.bt)+""][j]="-";
+						}
+					}
+					else {
+						dataArray[(element.t+senML.bt)+""][i+1]=element.v;
+					}				
+				});
+		});
+		var dataTablesArray = [];
+		alert("hey1");
+		$.each(dataArray,function(i,row) {
+	//	alert("hey2");
+			dataTablesArray.push(row);
+		});
+		alert("hey3");
+		var newTable = 
+			$(document.createElement('table'))
+				.attr("id",visuName+"Data")
+				.attr("class","table table-striped table-bordered")
+				.attr("cellpadding","0")
+				.attr("cellspacing","0")
+				.attr("border","0")
+				.append(
+					$(document.createElement('thead'))
+						.append(headers))
+				.append(
+					$(document.createElement('tbody')));
+		$('#'+displayDiv).append($(document.createElement('div')).append(newTable));
+		tableToJqueryDataTable (dataTablesArray,titles,visuName+"Data");		
+	}
 }
 
-function generateChart(visuName,sensors) {
+function generateChart(visuName,sensors,displayDiv) {
 
 	var seriesCounter = 0;
 	var seriesArray = [];
@@ -327,10 +354,10 @@ function generateChart(visuName,sensors) {
 		});	
 	}		
 
-	function drawChart(visuName,seriesArray) {
+	function drawChart(visuName,seriesArray,displayDiv) {
 	
 		var newChart = document.createElement('div');
-		$('#display').append(newChart);
+		$('#'+displayDiv).append(newChart);
 
 			rawChart = new Highcharts.StockChart({
 				chart: {

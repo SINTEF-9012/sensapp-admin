@@ -182,7 +182,7 @@ function updateSensorDescr (targetURL,putData,tableDiv) {
 function rewriteDescr(data,tableDiv) {
 
 	colId = $('#'+tableDiv).find("th:contains('Description')").index();
-	rowId = $('#'+tableDiv).find("tr").has("td:contains('"+data.id+"')").index();
+	rowId = $('#'+tableDiv).find("tr").has("a[id="+data.id+"]").index();
 
 	$('#'+tableDiv).find("tbody").find("tr").eq(rowId).find("td").eq(colId).html(createDescriptionColumn(data,"sensor").html());
 	$('#'+tableDiv).dataTable().$("div[rel=popover]").popover({placement:'right'});

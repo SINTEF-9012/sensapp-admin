@@ -27,7 +27,8 @@ function separateContained(targetURL,allSensorsURL,containedTable,sensorTable) {
 		success: 
 			function (compositeInfos, textStatus, jqXHR) {
 				var containedArray = new Array();
-				var othersArray = new Array();		
+				var othersArray = new Array();
+	
 				$.each(allSensorsURL, function (i,sensorURL) {
 					if(compositeInfos.sensors.indexOf(sensorURL)==-1) {
 						getPushOtherSensorInfos(sensorURL,othersArray,containedTable,sensorTable);						
@@ -485,9 +486,8 @@ function rewriteDescr(data,tableDiv) {
 
 	alert(tableDiv);
 	colId = $('#'+tableDiv).find("th:contains('Description')").index();
-	rowId = $('#'+tableDiv).find("tr").has("td:contains('"+data.id+"')").index();
-	alert(rowId+":"+colId);
-	alert($('#'+tableDiv).find("tbody").find("tr").eq(rowId).find("td").eq(colId).html());
+	rowId = $('#'+tableDiv).find("tr").has("a[id="+data.id+"]").index();
+
 	$('#'+tableDiv).find("tbody").find("tr").eq(rowId).find("td").eq(colId).html(createDescriptionColumn(data,"composite").html());
 	$('#'+tableDiv).dataTable().$("div[rel=popover]").popover({placement:'right'});
 
