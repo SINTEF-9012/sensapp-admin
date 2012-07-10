@@ -96,7 +96,8 @@
 				</thead>  
 				<tbody>
 				</tbody>
-			</table>  
+			</table> 
+		<hr>
 		</div>
 		<div id="sensors" style="margin-top:10px" hidden>
 			<button id="register" class="btn">Register</button>
@@ -110,12 +111,18 @@
 				</thead>  
 				<tbody>
 				</tbody>
-			</table>  
+			</table> 
+	<hr>
 		</div>
-		<hr>
     </div>
-	<div id="display" class="container-fluid">
+	<div id="display" class="container-fluid" hidden>
+		<button id="back" class="btn" onclick="$('#display').find('#data').empty();$('#display').hide();$('#visualisation').show();">Back</button>
+		<button id="save" class="btn">Get Javascript</button>
+		<div id="data">
+		</div> 
+	<hr>
 	</div>
+
 <!---------------------
 -Add Visualisation Modal div--
 ---------------------->	

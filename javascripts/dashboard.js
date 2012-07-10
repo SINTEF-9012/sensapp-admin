@@ -168,7 +168,7 @@ function getAllSensors (sensorDiv) {
 function generate(visuDiv,displayDiv) {
 
 	$('#'+visuDiv).hide();
-	$('#'+displayDiv).empty();
+	$('#'+displayDiv).show();
 		var nameColId = $('#'+visuDiv).find('table').find("th:contains('Name')").index();
 		var typeColId = $('#'+visuDiv).find('table').find("th:contains('Type')").index();
 		var sensorsColId = $('#'+visuDiv).find('table').find("th:contains('Sensors')").index();
@@ -201,6 +201,7 @@ function generate(visuDiv,displayDiv) {
 function generateTable (visuName,sensors,displayDiv) {
 
 	var sensorCounter = 0
+	var senMLArray = [];
 	
 	$.each(sensors,function (i,sensor) {
 		$.ajax({
@@ -220,8 +221,6 @@ function generateTable (visuName,sensors,displayDiv) {
 	});
 	
 	function getSensorTableData (visuName,sensorsInfos,displayDiv) {
-
-		var senMLArray = [];
 	
 		$.ajax({
 			type: "get",
@@ -245,38 +244,22 @@ function generateTable (visuName,sensors,displayDiv) {
 	
 	function createTable(senMLArray,visuName,displayDiv) {
 
-		var dataArray = [];
+		var dataArray = {};
 		var titles = [{"sTitle":"Time"}];
 		var headers = $(document.createElement('tr')).append($(document.createElement('th')).text("Time"));
-	
-		$.each(senMLArray,function(i,senML) {
+
+		$.each(senMLArray,function(currentSensor,senML) {
 			titles.push({"sTitle":senML.bn});
 			headers.append($(document.createElement('th')).text(senML.bn));
-			alert(JSON.stringify(dataArray));
-				$.each(senML.e, function(j,element) {
-					if(typeof dataArray[(senML.t+senML.bt)+""]=="undefined") {
-						dataArray[(element.t+senML.bt)+""]=[];
-						dataArray[(element.t+senML.bt)+""][0]=element.t+senML.bt;
-						for(var j=1;j<i+1;j++) {					
-							dataArray[(element.t+senML.bt)+""][j]="-";
-						}
-						dataArray[(element.t+senML.bt)+""][i+1]=element.v;
-						for(var j=i+2;j<senMLArray.length+1;j++) {					
-							dataArray[(element.t+senML.bt)+""][j]="-";
-						}
-					}
-					else {
-						dataArray[(element.t+senML.bt)+""][i+1]=element.v;
-					}				
-				});
+			if(senML.bt=='undefined') {
+				senML.bt=0
+			}
+			dataArray=getDataArray(dataArray,senML,currentSensor,senMLArray.length);
 		});
 		var dataTablesArray = [];
-		alert("hey1");
 		$.each(dataArray,function(i,row) {
-	//	alert("hey2");
 			dataTablesArray.push(row);
 		});
-		alert("hey3");
 		var newTable = 
 			$(document.createElement('table'))
 				.attr("id",visuName+"Data")
@@ -289,7 +272,7 @@ function generateTable (visuName,sensors,displayDiv) {
 						.append(headers))
 				.append(
 					$(document.createElement('tbody')));
-		$('#'+displayDiv).append($(document.createElement('div')).append(newTable));
+		$('#'+displayDiv).find('#data').append($(document.createElement('div')).append(newTable));
 		tableToJqueryDataTable (dataTablesArray,titles,visuName+"Data");		
 	}
 }
@@ -301,10 +284,10 @@ function generateChart(visuName,sensors,displayDiv) {
 	var numberOfSensors = sensors.length;
 	
 	$.each(sensors,function (i,sensor) {
-		generateLine(visuName,sensor);
+		generateLine(visuName,sensor,displayDiv);
 	});		
 	
-	function generateLine(visuName,sensor) {
+	function generateLine(visuName,sensor,displayDiv) {
 		$.ajax({
 			type: "get",
 			url: getURL(getTopology(),"registry","/sensapp/registry/sensors/"+sensor),
@@ -312,7 +295,7 @@ function generateChart(visuName,sensors,displayDiv) {
 			dataType:'json',
 			success: 
 				function (sensorsInfos, textStatus, jqXHR) {
-					getSensorChartData(visuName,sensorsInfos);
+					getSensorChartData(visuName,sensorsInfos,displayDiv);
 				},
 			error: 
 			function (jqXHR, textStatus, errorThrown) {
@@ -321,11 +304,11 @@ function generateChart(visuName,sensors,displayDiv) {
 		});	
 	}
 
-	function getSensorChartData(visuName,sensorsInfos) {
+	function getSensorChartData(visuName,sensorsInfos,displayDiv) {
 		
 		$.ajax({
 			type: "get",
-			url: getURL(getTopology(),"database."+sensorsInfos.backend.kind,sensorsInfos.backend.dataset+"?sorted=asc"),
+			url: sensorsInfos.backend.dataset+"?sorted=asc",
 			contentType: "application/json",
 			dataType:'json',
 			success: 
@@ -344,7 +327,7 @@ function generateChart(visuName,sensors,displayDiv) {
 										type:graphType
 									});
 					if(seriesCounter==numberOfSensors) {
-						drawChart(visuName,seriesArray);
+						drawChart(visuName,seriesArray,displayDiv);
 					}
 				},
 			error: 
@@ -357,8 +340,7 @@ function generateChart(visuName,sensors,displayDiv) {
 	function drawChart(visuName,seriesArray,displayDiv) {
 	
 		var newChart = document.createElement('div');
-		$('#'+displayDiv).append(newChart);
-
+		$('#'+displayDiv).find('#data').append(newChart);
 			rawChart = new Highcharts.StockChart({
 				chart: {
 					renderTo: newChart
@@ -374,62 +356,83 @@ function generateChart(visuName,sensors,displayDiv) {
 	}
 }
 
-function getDataArray(data) {
+function getDataArray(dataArray,senML,currentSensor,sensorNumber) {
 
-	var dataArray = new Array();
 	//Check out the kind of data
-	if(typeof data.e!='undefined') {
-		if(typeof data.e[0].v!='undefined') {
-			if(typeof data.bt=='undefined') {
-				$.each(data.e, function (i,element) {
-					dataArray.push( [timeStampToDate(element.t),element.v + " " + element.u] );
-				});
+	if(typeof senML.e[0].v!='undefined') {
+		$.each(senML.e, function(j,element) {
+			if(typeof dataArray[(element.t+senML.bt)+""]=='undefined') {
+				dataArray[(element.t+senML.bt)+""]=[];
+				dataArray[(element.t+senML.bt)+""][0]=element.t+senML.bt;
+				for(var j=1;j<currentSensor+1;j++) {					
+					dataArray[(element.t+senML.bt)+""][j]="-";
+				}
+				dataArray[(element.t+senML.bt)+""][currentSensor+1]=element.v;
+				for(var j=currentSensor+2;j<sensorNumber+1;j++) {					
+					dataArray[(element.t+senML.bt)+""][j]="-";
+				}
 			}
 			else {
-				$.each(data.e, function (i,element) {
-					dataArray.push( [timeStampToDate(element.t+data.bt),element.v + " " + element.u] );
-				});
+				dataArray[(element.t+senML.bt)+""][currentSensor+1]=element.v;
 			}
-		} else { 
-			if (typeof data.e[0].sv!='undefined') {
-				if(typeof data.bt=='undefined') {
-					$.each(data.e, function (i,element) {
-						dataArray.push( [timeStampToDate(element.t),element.sv + " " + element.u] );
-					});
+		});
+	} else {
+		if (typeof senML.e[0].sv!='undefined') {
+			$.each(senML.e, function(j,element) {
+				if(typeof dataArray[(element.t+senML.bt)+""]=='undefined') {
+					dataArray[(element.t+senML.bt)+""]=[];
+					dataArray[(element.t+senML.bt)+""][0]=element.t+senML.bt;
+					for(var j=1;j<currentSensor+1;j++) {					
+						dataArray[(element.t+senML.bt)+""][j]="-";
+					}
+					dataArray[(element.t+senML.bt)+""][currentSensor+1]=element.sv;
+					for(var j=currentSensor+2;j<sensorNumber+1;j++) {					
+						dataArray[(element.t+senML.bt)+""][j]="-";
+					}
 				}
 				else {
-					$.each(data.e, function (i,element) {
-						dataArray.push( [timeStampToDate(element.t+data.bt),element.sv + " " + element.u] );
-					});
+					dataArray[(element.t+senML.bt)+""][i+1]=element.sv;
 				}
-			} else { 
-				if (typeof data.e[0].bv!='undefined') {
-					if(typeof data.bt=='undefined') {
-						$.each(data.e, function (i,element) {
-							dataArray.push( [timeStampToDate(element.t),element.bv] );
-						});
+			});		
+		} else {
+			if ( typeof senML.e[0].bv!='undefined') {
+				$.each(senML.e, function(j,element) {
+					if(typeof dataArray[(element.t+senML.bt)+""]=='undefined') {
+						dataArray[(element.t+senML.bt)+""]=[];
+						dataArray[(element.t+senML.bt)+""][0]=element.t+senML.bt;
+						for(var j=1;j<currentSensor+1;j++) {					
+							dataArray[(element.t+senML.bt)+""][j]="-";
+						}
+						dataArray[(element.t+senML.bt)+""][currentSensor+1]=element.bv;
+						for(var j=currentSensor+2;j<sensorNumber+1;j++) {					
+							dataArray[(element.t+senML.bt)+""][j]="-";
+						}
 					}
 					else {
-						$.each(data.e, function (i,element) {
-							dataArray.push( [timeStampToDate(element.t+data.bt),element.bv] );
-						});
+						dataArray[(element.t+senML.bt)+""][currentSensor+1]=element.bv;
 					}
-				} else {
-					if (typeof data.e[0].s!='undefined') {
-						if(typeof data.bt=='undefined') {
-							$.each(data.e, function (i,element) {
-								dataArray.push( [timeStampToDate(element.t),element.bv] );
-							});
+				});		
+			} else {
+				if (typeof senML.e[0].s!='undefined') {
+					$.each(senML.e, function(j,element) {
+						if(typeof dataArray[(element.t+senML.bt)+""]=='undefined') {
+							dataArray[(element.t+senML.bt)+""]=[];
+							dataArray[(element.t+senML.bt)+""][0]=element.t+senML.bt;
+							for(var j=1;j<currentSensor+1;j++) {					
+								dataArray[(element.t+senML.bt)+""][j]="-";
+							}
+							dataArray[(element.t+senML.bt)+""][currentSensor+1]=element.s;
+							for(var j=currentSensor+2;j<sensorNumber+1;j++) {					
+								dataArray[(element.t+senML.bt)+""][j]="-";
+							}
 						}
 						else {
-							$.each(data.e, function (i,element) {
-								dataArray.push([timeStampToDate(element.t+data.bt),element.bv]);
-							});
+							dataArray[(element.t+senML.bt)+""][currentSensor+1]=element.s;
 						}
-					}
-				}
+					});		
+				}			
 			}
 		}
 	}
-	return dataArray;
+	return dataArray
 }
