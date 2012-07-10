@@ -2,7 +2,8 @@
 // Main Table Functions
 //**********************************
 
-function getAllSensors (targetURL,div) {
+//Init function
+function getAllSensors (targetURL,table) {
 	$.ajax({
 		type: "get",
 		url: targetURL,
@@ -11,7 +12,7 @@ function getAllSensors (targetURL,div) {
 		success: 
 			function (data, textStatus, jqXHR) {
 				if (data.length!=0) {
-					displayAllSensors(data,div);
+					displayAllSensors(data,table);
 				}
 			},
 		error: 
@@ -34,8 +35,6 @@ function displayAllSensors(data,table) {
 						  createSensorActions(sensor).html()]);
 	});
 	tableToJqueryDataTable (sensorArray,sensorColumns,table);
-
-
 }
 
 function addRowToSensorDataTable(sensor,sensorTable) {
@@ -46,8 +45,6 @@ function addRowToSensorDataTable(sensor,sensorTable) {
 		createSensorActions(sensor).html()] );
 }
 
-
-
 function createSensorActions(sensor) {
 
 	return $(document.createElement('td'))
@@ -55,7 +52,7 @@ function createSensorActions(sensor) {
 			//Edit Button
 			$(document.createElement('a'))
 				.attr("href","#edit-Sensor")
-				.attr("onclick","getMoreInputInfos(getURL(getTopology(),'registry','/registry/sensors/"+sensor.id+"'),'edit-Sensor')")
+				.attr("onclick","getMoreInputInfos(getURL(getTopology(),'registry','/sensapp/registry/sensors/"+sensor.id+"'),'edit-Sensor')")
 				.attr("data-toggle","modal")
 				.attr("class","btn")
 				.text("Edit")
@@ -77,20 +74,18 @@ function createSensorActions(sensor) {
 //**********************************
 
 function registerSensor(formDiv,tableDiv) {
-		var postData = getSensorToPost(formDiv);
-		postSensor(getURL(getTopology(),"registry","/registry/sensors"),postData,formDiv,tableDiv);
-	}
 
-function postSensor(targetURL,postData,formDiv,tableDiv) {
-
+	var postData = getSensorToPost(formDiv);
+	var targetURL = getURL(getTopology(),"registry","/sensapp/registry/sensors")
+	
 	$.ajax({
 		type: "post",
 		url: targetURL,
 		contentType: "application/json",
 		data: JSON.stringify(postData),
 		success: function (data,textStatus,jqXHR) {
-			var putData = getSensorInfosToPut(formDiv);
-			putSensorMetaData(targetURL+"/"+postData.id,putData,tableDiv,formDiv);
+			//Update Tags
+			putSensorMetaData(targetURL+"/"+postData.id,tableDiv,formDiv);
 		},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
@@ -99,14 +94,13 @@ function postSensor(targetURL,postData,formDiv,tableDiv) {
 	});
 }
 
-function putSensorMetaData (targetURL,putData,sensorTable,formDiv) {		 
-
+function putSensorMetaData (targetURL,sensorTable,formDiv) {		 
 	$.ajax({
 		type: "put",
 		url: targetURL,
 		contentType: "application/json",
 		dataType:'json',
-		data: JSON.stringify(putData),
+		data: JSON.stringify(getSensorInfosToPut(formDiv)),
 		success: 
 			function (data, textStatus, jqXHR) {
 				addRowToSensorDataTable(data,sensorTable);
@@ -120,6 +114,7 @@ function putSensorMetaData (targetURL,putData,sensorTable,formDiv) {
 	});
 }
 
+//Called When leaving the modal
 function clearAddModal(div) {
 	$('#'+div).find('tr[id$="TagRow"]').remove();
 	$('#'+div).find('input').attr("value","");
@@ -129,8 +124,8 @@ function clearAddModal(div) {
 // Edit Modal Functions
 //**********************************
 
+//Init Modal
 function getMoreInputInfos(targetURL,div) {
-
 	$.ajax({
 		type: "get",
 		url: targetURL,
@@ -145,17 +140,17 @@ function getMoreInputInfos(targetURL,div) {
 	});	
 }
 
-function updateSensorMetaData (targetURL,descr,metaData,tableDiv) {		 
-
+function updateSensor(id,formDiv,tableDiv) {
 	$.ajax({
 		type: "put",
-		url: targetURL,
+		url: getURL(getTopology(),"registry","/registry/sensors/"+id),
 		contentType: "application/json",
 		dataType:'json',
-		data: JSON.stringify(metaData),
+		data: JSON.stringify(getSensorInfosToPut(formDiv)),
 		success: 
 			function (data, textStatus, jqXHR) {
-				updateSensorDescr(targetURL,descr,tableDiv);
+				//udpate description too
+				updateSensorDescr(getURL(getTopology(),"registry","/sensapp/registry/sensors/"+id),getJSONDescr(formDiv),tableDiv);
 
 			},
 		error: function (jqXHR, textStatus, errorThrown) {
@@ -187,7 +182,7 @@ function updateSensorDescr (targetURL,putData,tableDiv) {
 function rewriteDescr(data,tableDiv) {
 
 	colId = $('#'+tableDiv).find("th:contains('Description')").index();
-	rowId = $('#'+tableDiv).find("tr").has("td:contains('"+data.id+"')").index();
+	rowId = $('#'+tableDiv).find("tr").has("a[id="+data.id+"]").index();
 
 	$('#'+tableDiv).find("tbody").find("tr").eq(rowId).find("td").eq(colId).html(createDescriptionColumn(data,"sensor").html());
 	$('#'+tableDiv).dataTable().$("div[rel=popover]").popover({placement:'right'});
@@ -252,6 +247,7 @@ function rewriteDescr(data,tableDiv) {
 	}
 }
 
+//Called When leaving the modal
 function clearEditModal(div) {
 	$('#'+div).find('#title').empty();
 	$('#'+div).find('tr[id$="TagRow"]').remove();
@@ -261,18 +257,15 @@ function clearEditModal(div) {
 	$('#'+div).find('#latitude').attr("value","");
 }
 
-function updateSensor(id,formDiv,tableDiv) {
-	updateSensorMetaData(getURL(getTopology(),"registry","/registry/sensors/"+id),getJSONDescr(formDiv),getSensorInfosToPut(formDiv),tableDiv);
-}
-
 //*********************************
 // Delete Modal Functions
 //**********************************
 
+//Init Modal
 function getDeleteInfos(sensorId,row,modalDiv,table) {
 	$('#'+modalDiv).find('h2').text("Delete " + sensorId + " ?");
 	$('#'+modalDiv).find('#delete').unbind('click').click( function () {
-		deleteSensor(getURL(getTopology(),'registry','/registry/sensors/'+sensorId),row,table);
+		deleteSensor(getURL(getTopology(),'registry','/sensapp/registry/sensors/'+sensorId),row,table);
 	});
 }
 

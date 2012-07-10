@@ -1,3 +1,4 @@
+//Should be in generic functions
 function getQuerystring(key, default_)
 {
   if (default_==null) default_=""; 

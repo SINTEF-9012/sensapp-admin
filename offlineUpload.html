@@ -1,80 +1,79 @@
 
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
 	<script src="http://code.jquery.com/jquery-latest.js"></script>
     <meta charset="utf-8">
     <title>SensApp</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <!-- Le styles -->
     <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
     <style type="text/css">
-      body {
+    body {
         padding-top: 60px;
         padding-bottom: 40px;
-      }
-      .sidebar-nav {
+    }
+    .sidebar-nav {
         padding: 9px 0;
-      }
-	
+    }
     </style>
-	
     <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+</head>
 
-    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-
-  <body>
-
+<body>
+<!---------------------
+-NavBarDiv div--
+---------------------->	
     <div class="navbar-fixed-top">
-	<div class="navbar">
-      <div class="navbar-inner">
-        <div class="container-fluid">
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </a>
-          <a class="brand" href="#">SensApp</a>
-          <div class="nav-collapse">
-            <ul class="nav">
-              <li id="admin" class="active dropdown">
-				<a class="dropdown-toggle" data-toggle="dropdown" href="#admin">Administration<b class="caret"></b></a>
-				<ul class="dropdown-menu">
-					<li class="active"><a href="index.html">Sensors</a></li>     
-					<li><a href="compositeAdmin.html">Composites</a></li>  
-					<li><a href="notificationAdmin.html">Notifications</a></li>  
-					<li><a href="#">Offline Upload</a></li>
-					<li class="divider"></li>
-					<li><a href="status.html">Status</a></li>
-					<li><a href="reset.html">Reset Sensapp</a></li>							
-				</ul>  
-			  </li>
-			  <li id="visu" class="dropdown">
-			  <a class="dropdown-toggle" data-toggle="dropdown" href="#visu">Visualisation<b class="caret"></b></a>
-			  	<ul class="dropdown-menu">
-					<li><a href="visualisation.html">Sensors</a></li>     
-					<li><a href="#">Composites</a></li> 
-					<li><a href="#">Dashboard</a></li>  
-				</ul>  
-			  </li>
-            </ul>
-			<ul class="nav pull-right">
-				<li class="divider-vertical"></li>
-				<li><a href="offlineUpload.html">Refresh page</a></li>
-			</ul>
-          </div><!--/.nav-collapse -->
-        </div>
+		<div class="navbar">
+			<div class="navbar-inner">
+				<div class="container-fluid">
+					<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</a>
+					<a class="brand" href="#">SensApp</a>
+					<div class="nav-collapse">
+						<ul class="nav">
+							<li id="admin" class="active dropdown">
+								<a class="dropdown-toggle" data-toggle="dropdown" href="#admin">Administration<b class="caret"></b></a>
+								<ul class="dropdown-menu">
+									<li class="active"><a href="index.html">Sensors</a></li>     
+									<li><a href="compositeAdmin.html">Composites</a></li>  
+									<li><a href="notificationAdmin.html">Notifications</a></li>  
+									<li><a href="#">Offline Upload</a></li>
+									<li class="divider"></li>
+									<li><a href="status.html">Status</a></li>
+									<li><a href="reset.html">Reset Sensapp</a></li>							
+								</ul>  
+							</li>
+							<li id="visu" class="dropdown">
+								<a class="dropdown-toggle" data-toggle="dropdown" href="#visu">Visualisation<b class="caret"></b></a>
+								<ul class="dropdown-menu">
+									<li><a href="visualisation.html">Sensors</a></li>     
+									<li><a href="#">Composites</a></li> 
+									<li><a href="dashboard.html">Dashboard</a></li>  
+								</ul>  
+							</li>
+						</ul>
+						<ul class="nav pull-right">
+							<li class="divider-vertical"></li>
+							<li><a href="offlineUpload.html">Refresh page</a></li>
+						</ul>
+					</div>
+				</div>
+				</div>
 		</div>
-      </div>
 	</div>
-	<div class="span4 offset4" id="alert-div" style="position:fixed;width:40%;margin-top:10px;">
-	</div>	
+<!---------------------
+-Alert div--
+---------------------->		
+	<div class="span4 offset4" id="alert-div" style="position:fixed;width:40%;margin-top:10px;"></div>	
+<!---------------------
+-Main div--
+---------------------->		
     <div id="loadDiv" class="container hero-unit">
 		<div class="row-fluid">
 			<h2>Offline Upload</h2><br>
@@ -88,13 +87,12 @@
 			</div>
 		</div>
 		<div class="span4">
-		<a class="btn" onclick="loadFile(getURL(getTopology(),'database.raw','/databases/raw/load'),'loadDiv');">Load</a>
+			<a class="btn" onclick="loadFile(getURL(getTopology(),'database.raw','/sensapp/databases/raw/load'),'loadDiv');">Load</a>
 		</div>
 	</div>
-	
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
+<!---------------------
+-Scripts--
+---------------------->	
     <script type="text/javascript" src="./javascripts/genericFunctions.js"></script>
 	<script type="text/javascript" src="./javascripts/offlineUpload.js"></script>
 	<script type="text/javascript" src="./javascripts/topology.js"></script>

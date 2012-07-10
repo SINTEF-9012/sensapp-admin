@@ -11,7 +11,7 @@ function getNotificationInformations(targetURL,notifierDiv,nonNotifierDiv) {
 		dataType:'json',
 		success: 
 			function (allSensors, textStatus, jqXHR) {
-				separateNotifiers(getURL(getTopology(),"notifier","/notification/registered?flatten=true"),allSensors,notifierDiv,nonNotifierDiv);	
+				separateNotifiers(getURL(getTopology(),"notifier","/sensapp/notification/registered?flatten=true"),allSensors,notifierDiv,nonNotifierDiv);	
 			},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
@@ -71,19 +71,14 @@ function separateNotifiers(targetURL,allSensors,notifierTable,nonNotifierTable) 
 //**********************************
 
 function registerNotifier(sensorName,row,notifierTable,nonNotifierTable) {
-	var postData = getNotifierToPost(sensorName);
-	postNotifier(getURL(getTopology(),"notifier","/notification/registered"),postData,row,notifierTable,nonNotifierTable);
-}
-
-function postNotifier(targetURL,postData,row,notifierTable,nonNotifierTable) {
 
 	$.ajax({
 		type: "post",
-		url: targetURL,
+		url: getURL(getTopology(),"notifier","/notification/registered"),
 		contentType: "application/json",
-		data: JSON.stringify(postData),
+		data: JSON.stringify(getNotifierToPost(sensorName)),
 		success: function (data,textStatus,jqXHR) {
-			addToNotifierTableById(getURL(getTopology(),"registry","/registry/sensors/"+postData.sensor),row,notifierTable,nonNotifierTable);
+			addToNotifierTableById(getURL(getTopology(),"registry","/sensapp/registry/sensors/"+postData.sensor),row,notifierTable,nonNotifierTable);
 		},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
@@ -111,7 +106,6 @@ function addToNonNotifierTableById(targetURL,row,notifierTable,nonNotifierTable)
 				alertMessage("error",errorThrown,5000);
 			}
 	});
- 
 }
 
 function createNonNotifierActions(sensor) {
@@ -144,7 +138,7 @@ function deleteNotifier(targetURL,sensorId,row,notifierTable,nonNotifierTable) {
 		url: targetURL,
 		success: 
 			function (data, textStatus, jqXHR) {
-				addToNonNotifierTableById(getURL(getTopology(),"registry","/registry/sensors/"+sensorId),row,notifierTable,nonNotifierTable);
+				addToNonNotifierTableById(getURL(getTopology(),"registry","/sensapp/registry/sensors/"+sensorId),row,notifierTable,nonNotifierTable);
 			},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
@@ -191,7 +185,7 @@ function createNotifierActions(sensor,notifierTable,nonNotifierTable) {
 				.attr("id",sensor.id+"-Hooks")
 				.attr("href","#hook-Modal")
 				.attr("data-toggle","modal")
-				.attr("onclick","getHookList(getURL(getTopology(),'notifier','/notification/registered/"+sensor.id+"'),'hook-Modal')")
+				.attr("onclick","getHookList(getURL(getTopology(),'notifier','/sensapp/notification/registered/"+sensor.id+"'),'hook-Modal')")
 				.text("Manage Hooks")
 		)
 		.append(' ')
@@ -209,7 +203,7 @@ function createNotifierActions(sensor,notifierTable,nonNotifierTable) {
 function getDeleteInfos (sensorId,row,modalDiv,notifierTable,nonNotifierTable) {
 	$('#'+modalDiv).find('h2').text("Delete " + sensorId + " ?");
 	$('#'+modalDiv).find('#delete').unbind('click').click( function () {
-			deleteNotifier(getURL(getTopology(),'notifier','/notification/registered/'+sensorId),sensorId,row,notifierTable,nonNotifierTable);
+			deleteNotifier(getURL(getTopology(),'notifier','/sensapp/notification/registered/'+sensorId),sensorId,row,notifierTable,nonNotifierTable);
 	});
 }
 
@@ -218,6 +212,7 @@ function getDeleteInfos (sensorId,row,modalDiv,notifierTable,nonNotifierTable) {
 // Hooks Admin Functions
 //**********************************
 
+//Init Modal
 function getHookList(targetURL,hookModal) {
 
 	$.ajax({
@@ -269,16 +264,18 @@ function clearHookModal(modalDiv) {
 
 function registerHooks(modalDiv,sensorId) {
 
+	//get the hooks to put
 	var hookList = new Array();
 	$.each($("#"+modalDiv).find('table>tbody>tr>td:nth-child(1)'),function (i,hook) {
 		hookList.push(hook.innerHTML);
 	});
 
+	//put the hooks
 	$.ajax({
 		type: "put",
 		contentType: "application/json",
 		async:false,
-		url: getURL(getTopology(),"notifier","/notification/registered/"+sensorId),
+		url: getURL(getTopology(),"notifier","/sensapp/notification/registered/"+sensorId),
 		data: JSON.stringify({"sensor":sensorId,"hooks":hookList}),
 		success: 
 			function (data, textStatus, jqXHR) {
