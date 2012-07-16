@@ -1,12 +1,39 @@
-function addVisualisation(formDiv,visuDiv,sensorDiv) {
-	addVisualisationToDataTable($('#'+formDiv).find('#id').val(),$('#'+formDiv).find('#type').val(),visuDiv,sensorDiv);
+//restore previous visu
+function initVisualisation(visuDiv) {
+	var visuArray=[];
+	
+	if(localStorage.getItem("visualisations")!=null) {
+		var body = $(document.createElement('tbody'))
+		body.html(localStorage.getItem("visualisations"));
+		$.each(body.children('tr'),function (i,row) {
+			visuArray[i]=[];
+			$.each($(row).children('td'),function (j,cell) {
+				visuArray[i].push($(cell).html());
+			});
+		});
+	}
+	tableToJqueryDataTable(visuArray,[{"sTitle":"Name"},{"sTitle":"Type"},{"sTitle":"Sensors"},{"sTitle":"Actions"}],$('#'+visuDiv).find('table').attr('id'),'asc');
 }
 
+//add new visualistion
+function addVisualisation(formDiv,visuDiv,sensorDiv) {
+	var newVisu = $('#'+formDiv).find('#id').val();
+	//test if correct name
+	if(newVisu.indexOf(' ')==-1 && $("#"+visuDiv).find('#'+newVisu).size()==0) {
+		addVisualisationToDataTable($('#'+formDiv).find('#id').val(),$('#'+formDiv).find('#type').val(),visuDiv,sensorDiv);
+	}
+	else {
+		alertMessage("error","Invalid name",5000);
+	}
+}
+
+//clear modal
 function clearVisualisationModal(div) {
 	$('#'+div).find('#id').attr("value","");
 	$('#'+div).find('#type').val("table");
 }
 
+//add to datatable
 function addVisualisationToDataTable(visu,type,visuDiv,sensorDiv) {
 
 	nameDiv = $(document.createElement('div')).append(
@@ -20,27 +47,34 @@ function addVisualisationToDataTable(visu,type,visuDiv,sensorDiv) {
 		type,
 		"",
 		createVisualisationActions(visu,type,visuDiv,sensorDiv).html()] );
+		
+	//store
+	localStorage.setItem("visualisations",$('#'+visuDiv).find('table').find('tbody').html());
 }
 
 function createVisualisationActions(visu,type,visuDiv,sensorDiv) {
 
 	return  $(document.createElement('div'))
 				.append(
+					//choose the sensors
 					$(document.createElement('button'))
 						.attr("class","btn")
 						.text("Choose Sensors")
 						.attr("onclick","showSensors('"+visu+"','"+type+"','"+visuDiv+"','"+sensorDiv+"')")
 				)
 				.append(
+					//delete
 					$(document.createElement('button'))
 						.attr("href","#delete-Visu")
 						.attr("data-toggle","modal")
 						.attr("onclick","getDeleteInfos('"+visu+"',this.parentNode.parentNode,'delete-Visu')")
 						.attr("class","btn btn-danger")
 						.html("<b style='font-size:16px'>&times;</b>")
-				);	
+				);
+						
 }
 
+//called when clicking on delete button
 function getDeleteInfos(visu,row,deleteModal) {
 
 	$('#'+deleteModal).find("h2").text("Delete "+ visu +" ?");
@@ -48,10 +82,13 @@ function getDeleteInfos(visu,row,deleteModal) {
 	$('#'+deleteModal).find('#deleteVisu').unbind('click').click( function () {
 		var oTable = $(row).closest('table').dataTable();
 		oTable.fnDeleteRow(oTable.fnGetPosition(row));
+		//store
+		localStorage.setItem("visualisations",$(row).closest('tbody').html());
 	});
 
 }
 
+//called when clicking on Choose Sensors button
 function showSensors(visuName,type,visuDiv,sensorDiv) {
 	$('#'+visuDiv).hide();
 	$('#'+sensorDiv).show();
@@ -66,34 +103,6 @@ function showSensors(visuName,type,visuDiv,sensorDiv) {
 			break;
 	}
 }
-
-//currently useless, but can be used
-function setRadioSelection(visuName,visuDiv,sensorDiv) {
-	
-	var oTable=$('#'+sensorDiv).find('table').dataTable();
-	//make radio selectable
-	$('#'+sensorDiv).find("table tbody").die().unbind('click').click(function(event) {
-			$(oTable.fnSettings().aoData).each(function (){
-				$(this.nTr).removeClass('row_selected');
-			});
-			$(event.target.parentNode).addClass('row_selected');
-			var sensorColId = $(this.parentNode).find("th:contains('Name')").index();
-			aSelected = [$(event.target.parentNode).find('td').eq(sensorColId).text()];
-		});
-		
-	//set Register Function
-	$('#'+sensorDiv).find('#register').unbind('click').click(function () {
-		if(aSelected.length>0) {
-			var sensorListColId = $('#'+visuDiv).find("th:contains('Sensors')").index();
-			var visuRowId = $('#'+visuDiv).find("tr td").find("#"+visuName).index();
-
-			$('#'+visuDiv).find("tbody").find('tr').eq(visuRowId).find('td').eq(sensorListColId).html("<div>"+aSelected[0]+"</div>");			
-		}
-		$('#'+visuDiv).show();
-		$('#'+sensorDiv).hide();
-	});
-}
-
 
 function setMutltipleSelection(visuName,visuDiv,sensorDiv) {
 
@@ -132,6 +141,8 @@ function setMutltipleSelection(visuName,visuDiv,sensorDiv) {
 		$('#'+sensorDiv).hide();
 		aSelected=[];
 		$('#'+sensorDiv).find('table').dataTable().$('.row_selected').toggleClass('row_selected');
+		//store
+		localStorage.setItem("visualisations",$('#'+visuDiv).find('table').find('tbody').html());	
 	});
 }
 //Displays  sensor Table
@@ -144,8 +155,9 @@ function getAllSensors (sensorDiv) {
 		dataType:'json',
 		success: 
 			function (data, textStatus, jqXHR) {
+				//fill table
 				var sensorColumns = [{"sTitle":"Name"},{"sTitle":"Description"},{"sTitle":"Creation Date"}];
-				tableToJqueryDataTable ([],sensorColumns,$('#'+sensorDiv).find("table").attr('id'));
+				tableToJqueryDataTable ([],sensorColumns,$('#'+sensorDiv).find("table").attr('id'),'asc');
 				if (data.length!=0) {
 					var sensorArray = new Array();
 					$.each(data,function (i,sensor) {
@@ -164,45 +176,58 @@ function getAllSensors (sensorDiv) {
 	});
 }
 
+//************
+// GENERATION
+//*************
 
+//Create the visualisations
 function generate(visuDiv,displayDiv) {
 
 	$('#'+visuDiv).hide();
 	$('#'+displayDiv).show();
-		var nameColId = $('#'+visuDiv).find('table').find("th:contains('Name')").index();
-		var typeColId = $('#'+visuDiv).find('table').find("th:contains('Type')").index();
-		var sensorsColId = $('#'+visuDiv).find('table').find("th:contains('Sensors')").index();
-
-		$.each($('#'+visuDiv).find('table tbody tr'), function (i,row) {
-			var visuName = $(row).find('td').eq(nameColId).text();
-			var visuType = $(row).find('td').eq(typeColId).text();
-			var sensors = new Array();	
 	
-			switch (visuType) {
-				case "table":
-					$.each($(row).find('td').eq(sensorsColId).find('div'),function(i,div) {
-						sensors.push(div.innerHTML);
-					});
-					generateTable(visuName,sensors,displayDiv);
-					break;
-				case "chart":
-					$.each($(row).find('td').eq(sensorsColId).find('div'),function(i,div) {
-						sensors.push(div.innerHTML);
-					});
-					generateChart(visuName,sensors,displayDiv);
-					break;
-				default:
-					break;
-			}
-		});
+	var nameColId = $('#'+visuDiv).find('table').find("th:contains('Name')").index();
+	var typeColId = $('#'+visuDiv).find('table').find("th:contains('Type')").index();
+	var sensorsColId = $('#'+visuDiv).find('table').find("th:contains('Sensors')").index();
+
+	//for each visualisation
+	$.each($('#'+visuDiv).find('table tbody tr'), function (i,row) {
+		var visuName = $(row).find('td').eq(nameColId).text();
+		var visuType = $(row).find('td').eq(typeColId).text();
+		var sensors = new Array();	
+	
+		switch (visuType) {
+			case "table":
+				$.each($(row).find('td').eq(sensorsColId).find('div'),function(i,div) {
+					sensors.push(div.innerHTML);
+				});
+				generateTable(visuName,sensors,displayDiv);
+				break;
+			case "chart":
+				$.each($(row).find('td').eq(sensorsColId).find('div'),function(i,div) {
+					sensors.push(div.innerHTML);
+				});
+				generateChart(visuName,sensors,displayDiv);
+				break;
+			case "map":
+				$.each($(row).find('td').eq(sensorsColId).find('div'),function(i,div) {
+					sensors.push(div.innerHTML);
+				});
+				generateMap(visuName,sensors,displayDiv);
+			default:
+				break;
+		}
+	});
 }
-
-
+//****
+//TABLE
+//****
+//create a table
 function generateTable (visuName,sensors,displayDiv) {
 
 	var sensorCounter = 0
 	var senMLArray = [];
-	
+	('#'+displayDiv).show();
 	$.each(sensors,function (i,sensor) {
 		$.ajax({
 			type: "get",
@@ -220,6 +245,7 @@ function generateTable (visuName,sensors,displayDiv) {
 		});	
 	});
 	
+	//get the data
 	function getSensorTableData (visuName,sensorsInfos,displayDiv) {
 	
 		$.ajax({
@@ -242,6 +268,7 @@ function generateTable (visuName,sensors,displayDiv) {
 		});	
 	}
 	
+	//actually creates table
 	function createTable(senMLArray,visuName,displayDiv) {
 
 		var dataArray = {};
@@ -251,15 +278,25 @@ function generateTable (visuName,sensors,displayDiv) {
 		$.each(senMLArray,function(currentSensor,senML) {
 			titles.push({"sTitle":senML.bn});
 			headers.append($(document.createElement('th')).text(senML.bn));
-			if(senML.bt=='undefined') {
-				senML.bt=0
+			if(typeof senML.e!='undefined') {
+				//Check Base Time
+				if(typeof senML.bt=='undefined') {
+					senML.bt=0;
+				}
+				if (typeof senML.e[0].u != 'undefined') {
+					headers.find('th:last').append(" ("+ senML.e[0].u +")");
+				}
+				//Get the associative array of data
+				dataArray=getDataArray(dataArray,senML,currentSensor,senMLArray.length);
 			}
-			dataArray=getDataArray(dataArray,senML,currentSensor,senMLArray.length);
 		});
+		//Transform into dataTables Array
 		var dataTablesArray = [];
 		$.each(dataArray,function(i,row) {
 			dataTablesArray.push(row);
 		});
+		
+		//Create Table in DOM
 		var newTable = 
 			$(document.createElement('table'))
 				.attr("id",visuName+"Data")
@@ -271,23 +308,30 @@ function generateTable (visuName,sensors,displayDiv) {
 					$(document.createElement('thead'))
 						.append(headers))
 				.append(
-					$(document.createElement('tbody')));
+					$(document.createElement('tbody'))
+				);
 		$('#'+displayDiv).find('#data').append($(document.createElement('div')).append(newTable));
-		tableToJqueryDataTable (dataTablesArray,titles,visuName+"Data");		
+		tableToJqueryDataTable (dataTablesArray,titles,visuName+"Data",'desc');		
 	}
 }
-
+//*******
+//CHART
+//*******
+//create a chart
 function generateChart(visuName,sensors,displayDiv) {
 
 	var seriesCounter = 0;
 	var seriesArray = [];
 	var numberOfSensors = sensors.length;
 	
+	//create each line
 	$.each(sensors,function (i,sensor) {
 		generateLine(visuName,sensor,displayDiv);
 	});		
 	
+	//create a line
 	function generateLine(visuName,sensor,displayDiv) {
+		//get the sensor
 		$.ajax({
 			type: "get",
 			url: getURL(getTopology(),"registry","/sensapp/registry/sensors/"+sensor),
@@ -295,6 +339,7 @@ function generateChart(visuName,sensors,displayDiv) {
 			dataType:'json',
 			success: 
 				function (sensorsInfos, textStatus, jqXHR) {
+					//get the data
 					getSensorChartData(visuName,sensorsInfos,displayDiv);
 				},
 			error: 
@@ -304,6 +349,7 @@ function generateChart(visuName,sensors,displayDiv) {
 		});	
 	}
 
+	//get the sensor data
 	function getSensorChartData(visuName,sensorsInfos,displayDiv) {
 		
 		$.ajax({
@@ -320,13 +366,15 @@ function generateChart(visuName,sensors,displayDiv) {
 					else {
 						graphType='line';
 					}
-
+					//put data in array
 					seriesArray.push({	name:SenMLData.bn,
 										data:SenMLToHighcharts(SenMLData),
 										step:(typeof SenMLData.e[0].bv!='undefined'),
 										type:graphType
 									});
+					//if we have all the data
 					if(seriesCounter==numberOfSensors) {
+						//draw the chart
 						drawChart(visuName,seriesArray,displayDiv);
 					}
 				},
@@ -337,6 +385,7 @@ function generateChart(visuName,sensors,displayDiv) {
 		});	
 	}		
 
+	//draw the chart
 	function drawChart(visuName,seriesArray,displayDiv) {
 	
 		var newChart = document.createElement('div');
@@ -356,14 +405,37 @@ function generateChart(visuName,sensors,displayDiv) {
 	}
 }
 
-function getDataArray(dataArray,senML,currentSensor,sensorNumber) {
+//*****
+//MAP
+//******
+function generateMap(visuName,sensors,displayDiv) {
 
+	newMapDiv = $(document.createElement('div')).attr("width","100%").attr("height","100%");
+
+    var myOptions = {
+          center: new google.maps.LatLng(-34.397, 150.644),
+          zoom: 8,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        var map = new google.maps.Map(newMapDiv[0],
+            myOptions);
+
+	$('#'+displayDiv).find('#data').append(newMapDiv);
+}
+
+//create an associative array with all the senML data
+function getDataArray(dataArray,senML,currentSensor,sensorNumber) {
 	//Check out the kind of data
+	//Numeric
+	if(typeof senML.bt=='undefined') {
+		senML.bt = 0;
+	}
+	
 	if(typeof senML.e[0].v!='undefined') {
 		$.each(senML.e, function(j,element) {
 			if(typeof dataArray[(element.t+senML.bt)+""]=='undefined') {
 				dataArray[(element.t+senML.bt)+""]=[];
-				dataArray[(element.t+senML.bt)+""][0]=element.t+senML.bt;
+				dataArray[(element.t+senML.bt)+""][0]=timeStampToDate(element.t+senML.bt);
 				for(var j=1;j<currentSensor+1;j++) {					
 					dataArray[(element.t+senML.bt)+""][j]="-";
 				}
@@ -376,12 +448,14 @@ function getDataArray(dataArray,senML,currentSensor,sensorNumber) {
 				dataArray[(element.t+senML.bt)+""][currentSensor+1]=element.v;
 			}
 		});
-	} else {
+	} 
+	else {
+		//String
 		if (typeof senML.e[0].sv!='undefined') {
 			$.each(senML.e, function(j,element) {
 				if(typeof dataArray[(element.t+senML.bt)+""]=='undefined') {
 					dataArray[(element.t+senML.bt)+""]=[];
-					dataArray[(element.t+senML.bt)+""][0]=element.t+senML.bt;
+					dataArray[(element.t+senML.bt)+""][0]=timeStampToDate(element.t+senML.bt);
 					for(var j=1;j<currentSensor+1;j++) {					
 						dataArray[(element.t+senML.bt)+""][j]="-";
 					}
@@ -391,15 +465,17 @@ function getDataArray(dataArray,senML,currentSensor,sensorNumber) {
 					}
 				}
 				else {
-					dataArray[(element.t+senML.bt)+""][i+1]=element.sv;
+					dataArray[(element.t+senML.bt)+""][currentSensor+1]=element.sv;
 				}
 			});		
-		} else {
+		} 
+		else {
+			//Bool
 			if ( typeof senML.e[0].bv!='undefined') {
 				$.each(senML.e, function(j,element) {
 					if(typeof dataArray[(element.t+senML.bt)+""]=='undefined') {
 						dataArray[(element.t+senML.bt)+""]=[];
-						dataArray[(element.t+senML.bt)+""][0]=element.t+senML.bt;
+						dataArray[(element.t+senML.bt)+""][0]=timeStampToDate(element.t+senML.bt);
 						for(var j=1;j<currentSensor+1;j++) {					
 							dataArray[(element.t+senML.bt)+""][j]="-";
 						}
@@ -412,12 +488,14 @@ function getDataArray(dataArray,senML,currentSensor,sensorNumber) {
 						dataArray[(element.t+senML.bt)+""][currentSensor+1]=element.bv;
 					}
 				});		
-			} else {
+			} 
+			else {
+				//Summed
 				if (typeof senML.e[0].s!='undefined') {
 					$.each(senML.e, function(j,element) {
 						if(typeof dataArray[(element.t+senML.bt)+""]=='undefined') {
 							dataArray[(element.t+senML.bt)+""]=[];
-							dataArray[(element.t+senML.bt)+""][0]=element.t+senML.bt;
+							dataArray[(element.t+senML.bt)+""][0]=timeStampToDate(element.t+senML.bt);
 							for(var j=1;j<currentSensor+1;j++) {					
 								dataArray[(element.t+senML.bt)+""][j]="-";
 							}
@@ -434,5 +512,5 @@ function getDataArray(dataArray,senML,currentSensor,sensorNumber) {
 			}
 		}
 	}
-	return dataArray
+	return dataArray;
 }

@@ -40,7 +40,7 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</a>
-					<a class="brand" href="#">SensApp</a>
+					<a class="brand" href="index.html">SensApp</a>
 					<div class="nav-collapse">
 						<ul class="nav">
 							<li id="admin" class="dropdown">
@@ -51,7 +51,7 @@
 									<li><a href="notificationAdmin.html">Notifications</a></li>  
 									<li><a href="offlineUpload.html">Offline Upload</a></li>
 									<li class="divider"></li>
-									<li><a href="status.html">Status</a></li>
+									<li><a href="status.html">Configuration</a></li>
 									<li><a href="reset.html">Reset Sensapp</a></li>						
 								</ul>  
 							</li>
@@ -59,14 +59,14 @@
 								<a class="dropdown-toggle" data-toggle="dropdown" href="#visu">Visualisation<b class="caret"></b></a>
 								<ul class="dropdown-menu">
 									<li><a href="visualisation.html">Sensors</a></li>     
-									<li><a href="#">Composites</a></li> 
-									<li class="active"><a href="#">Dashboard</a></li>  
+									<li><a href="compositeVisualisation.html">Composites</a></li> 
+									<li class="active"><a href="dashboard.html">Dashboard</a></li>  
 								</ul>  
 							</li>
 						</ul>
 						<ul class="nav pull-right">
 							<li class="divider-vertical"></li>
-							<li><a href="index.html">Refresh page</a></li>
+							<li><a href="dashboard.html">Refresh page</a></li>
 						</ul>
 					</div>
 				</div>
@@ -115,7 +115,7 @@
 	<hr>
 		</div>
     </div>
-	<div id="display" class="container-fluid" hidden>
+	<div id="display" class="container-fluid">
 		<button id="back" class="btn" onclick="$('#display').find('#data').empty();$('#display').hide();$('#visualisation').show();">Back</button>
 		<button id="save" class="btn">Get Javascript</button>
 		<div id="data">
@@ -146,6 +146,7 @@
 							<select id="type" class="input-medium search-query" style="width:180px;">
 								<option value="table">Table</option>
 								<option value="chart">Chart</option>
+								<option value="map">Map</option>
 							</select>
 						</td>
 					</tr>
@@ -182,11 +183,8 @@
 	<script type="text/javascript" charset="utf-8" language="javascript" src="bootstrap/js/DT_bootstrap.js"></script>
 	<script src="./highstock/js/highstock.js"></script>
 	<script src="./highstock/js/modules/exporting.js"></script>	
-	<script id="myScript">
-	var initDashboard;
-	</script>
 	<script>
-	tableToJqueryDataTable([],[{"sTitle":"Name"},{"sTitle":"Type"},{"sTitle":"Sensors"},{"sTitle":"Actions"}],'visualisationTable','asc');
+	initVisualisation('visualisation')
 	getAllSensors ('sensors');
 	//selected Items are here
 	aSelected = [];
@@ -196,6 +194,7 @@
 		}
 	});
 	</script>
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBqAcd9tICH9qmHGL3ieuYoz3WSITCsCic&sensor=false"></script>
     <script src="bootstrap/js/bootstrap-transition.js"></script>
     <script src="bootstrap/js/bootstrap-alert.js"></script>
     <script src="bootstrap/js/bootstrap-modal.js"></script>

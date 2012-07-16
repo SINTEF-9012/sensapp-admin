@@ -5,12 +5,12 @@ function getTopology() {
 	}
 	else {
 		topology = 	{		
-		  "nodes": [{ "name": "local", "srv": "", "port": "" }],
+		  "nodes": [{ "name": "sensAppDemo", "srv": "54.247.172.50", "port": "80" }],
 		  "deployment": [
-			{ "service": "database.raw", "node": "local" },
-			{ "service": "dispatch",     "node": "local" },
-			{ "service": "notifier",     "node": "local" },
-			{ "service": "registry",     "node": "local" }
+			{ "service": "database.raw", "node": "sensAppDemo" },
+			{ "service": "dispatch",     "node": "sensAppDemo" },
+			{ "service": "notifier",     "node": "sensAppDemo" },
+			{ "service": "registry",     "node": "sensAppDemo" }
 		  ]
 		};
 		return  topology;

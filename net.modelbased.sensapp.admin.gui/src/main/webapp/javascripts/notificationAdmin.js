@@ -33,6 +33,7 @@ function separateNotifiers(targetURL,allSensors,notifierTable,nonNotifierTable) 
 				var nonNotifiersArray = new Array();
 				var notifiersColumns = [{"sTitle":"Name"},{"sTitle":"Description"},{"sTitle":"Creation Date"},{"sTitle":"Actions"}];
 				var nonNotifiersColumms = [{"sTitle":"Name"},{"sTitle":"Description"},{"sTitle":"Creation Date"},{"sTitle":"Actions"}];
+				//Test the sensors
 				$.each(allSensors, function (i,sensor) {
 					var isNotifier=false;
 					var i=0;
@@ -42,19 +43,23 @@ function separateNotifiers(targetURL,allSensors,notifierTable,nonNotifierTable) 
 						}
 						i++;
 					}
+					// sensor is not in notifier Array
 					if(isNotifier==false) {
-						nonNotifiersArray.push([createNameColumn(sensor.id,"sensor").html(),
+						nonNotifiersArray.push([createNameColumn(sensor.id,getURL(getTopology(),"registry","/sensapp/registry/sensors/"+sensor.id)).html(),
 												createDescriptionColumn(sensor,"sensor").html(),
 												timeStampToDate(sensor.creation_date),
 												createNonNotifierActions(sensor).html()]);
 					}
+					//sensor is in notifier Array
 					else {
-						notifiersArray.push([createNameColumn(sensor.id,"notifier").html(),
+						notifiersArray.push([createNameColumn(sensor.id,getURL(getTopology(),"registry","/sensapp/notification/registered/"+sensor.id)).html(),
 							 createDescriptionColumn(sensor,"notifier").html(),
 							 timeStampToDate(sensor.creation_date),
 							 createNotifierActions(sensor,notifierTable,nonNotifierTable).html()]);
 					}
-				});			
+				});
+				
+				//Create the table
 				tableToJqueryDataTable (notifiersArray,notifiersColumns,notifierTable);
 				tableToJqueryDataTable (nonNotifiersArray,nonNotifiersColumms,nonNotifierTable);
 			},
@@ -70,15 +75,16 @@ function separateNotifiers(targetURL,allSensors,notifierTable,nonNotifierTable) 
 // Non Notifier Table Functions
 //**********************************
 
+//Add notifier button
 function registerNotifier(sensorName,row,notifierTable,nonNotifierTable) {
 
 	$.ajax({
 		type: "post",
-		url: getURL(getTopology(),"notifier","/notification/registered"),
+		url: getURL(getTopology(),"notifier","/sensapp/notification/registered"),
 		contentType: "application/json",
 		data: JSON.stringify(getNotifierToPost(sensorName)),
 		success: function (data,textStatus,jqXHR) {
-			addToNotifierTableById(getURL(getTopology(),"registry","/sensapp/registry/sensors/"+postData.sensor),row,notifierTable,nonNotifierTable);
+			addToNotifierTableById(getURL(getTopology(),"registry","/sensapp/registry/sensors/"+sensorName),row,notifierTable,nonNotifierTable);
 		},
 		error: 
 			function (jqXHR, textStatus, errorThrown) {
@@ -87,6 +93,7 @@ function registerNotifier(sensorName,row,notifierTable,nonNotifierTable) {
 	});
 }
 
+//Called when deleting a notifier
 function addToNonNotifierTableById(targetURL,row,notifierTable,nonNotifierTable) {
  
 	$.ajax({
@@ -122,7 +129,7 @@ function createNonNotifierActions(sensor) {
  
 function addRowToNonNotifierDatable(sensor,nonNotifierTable) {
 	$('#'+nonNotifierTable).dataTable().fnAddData( [
-		createNameColumn(sensor.id,"sensor").html(),
+		createNameColumn(sensor.id,getURL(getTopology(),"registry","/sensapp/registry/sensors/"+sensor.id)).html(),
 		createDescriptionColumn(sensor,"sensor").html(),
 		timeStampToDate(sensor.creation_date),
 		createNonNotifierActions(sensor).html()] );
@@ -132,6 +139,7 @@ function addRowToNonNotifierDatable(sensor,nonNotifierTable) {
 // Notifier Table Functions
 //**********************************
 
+//Delete notifier button
 function deleteNotifier(targetURL,sensorId,row,notifierTable,nonNotifierTable) {
 	$.ajax({
 		type: "delete",
@@ -147,6 +155,7 @@ function deleteNotifier(targetURL,sensorId,row,notifierTable,nonNotifierTable) {
 	});
 }
 
+//Called when adding a notifier
 function addToNotifierTableById(targetURL,row,notifierTable,nonNotifierTable) {
  
 	$.ajax({
@@ -170,7 +179,7 @@ function addToNotifierTableById(targetURL,row,notifierTable,nonNotifierTable) {
  
 function addRowToNotifierDatable(sensor,notifierTable,nonNotifierTable) {
 	$('#'+notifierTable).dataTable().fnAddData( [
-		createNameColumn(sensor.id,"notifier").html(),
+		createNameColumn(sensor.id,getURL(getTopology(),"registry","/sensapp/notification/registered/"+sensor.id)).html(),
 		createDescriptionColumn(sensor,"notifier").html(),
 		timeStampToDate(sensor.creation_date),
 		createNotifierActions(sensor,notifierTable,nonNotifierTable).html()] );
@@ -199,6 +208,10 @@ function createNotifierActions(sensor,notifierTable,nonNotifierTable) {
 				.html("<b style='font-size:16px'>&times;</b>")
 		);	
 }
+
+//*********************************
+// Delete Modal Functions
+//**********************************
 
 function getDeleteInfos (sensorId,row,modalDiv,notifierTable,nonNotifierTable) {
 	$('#'+modalDiv).find('h2').text("Delete " + sensorId + " ?");
@@ -229,6 +242,7 @@ function getHookList(targetURL,hookModal) {
 	});
 }
 
+//fill modal
 function displayHookModal(notifier,hookModal) {
 
 	$('#'+hookModal).find('h2').text("Hook list of "+notifier.sensor);
@@ -241,11 +255,14 @@ function displayHookModal(notifier,hookModal) {
 
 function addRowToHookDatable(hook,hookModal) {
 	$('#'+hookModal).find('tbody')
+		//new Row
 		.append($(document.createElement('tr'))
 			.append($(document.createElement('td'))
 					.text(hook))
+			//new hook
 			.append($(document.createElement('td'))
 					.append(
+						//new delete button
 						$(document.createElement('button'))
 							.attr("class","btn btn-danger")
 							.click( function () {
@@ -257,6 +274,7 @@ function addRowToHookDatable(hook,hookModal) {
 		);
 }
 
+//empty modal when leaving
 function clearHookModal(modalDiv) {
 	$("#"+modalDiv).find('tbody').empty();
 	$("#"+modalDiv).find('input').val("");

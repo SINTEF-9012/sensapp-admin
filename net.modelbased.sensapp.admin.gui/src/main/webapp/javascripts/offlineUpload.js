@@ -8,6 +8,7 @@ function loadFile(targetURL,inputDiv) {
         return;
     }
 
+	//Error Catching
     input = $('#'+inputDiv).find('input').get(0);
     if (!input) {
         alertMessage("error","Um, couldn't find the fileinput element.",5000);
@@ -18,6 +19,7 @@ function loadFile(targetURL,inputDiv) {
     else if (!input.files[0]) {
         alertMessage("error","Please select a file before clicking 'Load'",5000);
     }
+	//its ok
     else {
         file = input.files[0];
         fr = new FileReader();

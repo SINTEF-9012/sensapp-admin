@@ -18,18 +18,7 @@
 	<script type="text/javascript" src="./javascripts/topology.js"></script>
 	<script type="text/javascript" src="./javascripts/raw.js"></script>
 	<script type="text/javascript">
-		switch (getQuerystring("type")) {
-			case "sensor":
-				getSensor(getURL(getTopology(),"registry","/sensapp/registry/sensors/"+getQuerystring("sensor")));
-				break;
-			case "composite":
-				getSensor(getURL(getTopology(),"registry","/sensapp/registry/composite/sensors/"+getQuerystring("sensor")));
-				break;
-			case "notifier":
-				getSensor(getURL(getTopology(),"notifier","/sensapp/notification/registered/"+getQuerystring("sensor")));		
-			default:
-				break;
-		}
+	getSensor(getQuerystring("url"));
 	</script>
 </body>
 </html>

@@ -121,7 +121,7 @@ function displayAllComposite(data,compositeTable,containedTable,sensorTable) {
 	var compositeColumns = [{"sTitle":"Name"},{"sTitle":"Description"},{"sTitle":"Actions"}];
 
 	$.each(data,function (i,sensor) {
-		compositeArray.push([createNameColumn(sensor.id,"composite").html(),
+		compositeArray.push([createNameColumn(sensor.id,getURL(getTopology(),"registry","/sensapp/registry/composite/sensors/"+sensor.id)).html(),
 							 createDescriptionColumn(sensor,"composite").html(),
 							 createCompositeActions(sensor,compositeTable,containedTable,sensorTable).html()]);
 	});
@@ -159,38 +159,16 @@ function createCompositeActions(sensor,compositeTable,containedTable,sensorTable
 			);	
 }
 
-function getEditInfos(targetURL,editModal) {
-
-	$.ajax({
-		type: "get",
-		url: targetURL,
-		success: 
-			function (data, textStatus, jqXHR) {
-				fillEditModal(data,editModal);
-			},
-		error: 
-			function (jqXHR, textStatus, errorThrown) {
-				alertMessage("error",errorThrown,5000);
-			}
-	});	
-}
-
-
-function getDeleteInfos (sensorId,row,modalDiv,table) {
-	$('#'+modalDiv).find('h2').text("Delete " + sensorId + " ?");
-	$('#'+modalDiv).find('#delete').unbind('click').click( function () {
-		removeComposite(getURL(getTopology(),'registry','/sensapp/registry/composite/sensors/'+sensorId),row,table)
-	});
-}
-
+//Used in Manage Content OnClick
 function dispatchSensors (sensorId,containedTable,sensorTable) {
-		$('#tablesDiv').find('#contained').find('h2').text("Sensors of "+sensorId);
+		$('#'+containedTable).find('h2').text("Sensors of "+sensorId);
 		getCompositeInformations(getURL(getTopology(),'registry','/sensapp/registry/sensors'),sensorId,containedTable,sensorTable);
-		$('#tablesDiv').find('#all').show();
-		$('#tablesDiv').find('#contained').show();
-		$('#tablesDiv').find('#composite').hide();
+		$('#'+sensorTable).show();
+		$('#'+containedTable).show();
+		$('#'+containedTable).hide();
 	}
 
+//Called when adding a new Composite
 function addRowToCompositeDatable(sensor,compositeTable,containedTable,sensorTable) {
 	$('#'+compositeTable).dataTable().fnAddData( [
 		createNameColumn(sensor.id,"composite").html(),
@@ -213,6 +191,11 @@ function removeComposite(targetURL,row,compositeTable) {
 			}
 	});
 }
+
+//*********************************
+// Edit Modal Functions
+//**********************************
+
 
 //*********************************
 // Contained Table Functions
@@ -387,6 +370,23 @@ function clearAddModal(div) {
 // Edit Modal functions
 //**********************************
 
+//fill the edit modal
+function getEditInfos(targetURL,editModal) {
+
+	$.ajax({
+		type: "get",
+		url: targetURL,
+		success: 
+			function (data, textStatus, jqXHR) {
+				fillEditModal(data,editModal);
+			},
+		error: 
+			function (jqXHR, textStatus, errorThrown) {
+				alertMessage("error",errorThrown,5000);
+			}
+	});	
+}
+
 function fillEditModal(data,editModal) {
 
 	$('#'+editModal).find('#title').text(data.id);
@@ -400,9 +400,11 @@ function fillEditModal(data,editModal) {
 		$.each(data.tags, function(i,element) {
 			$('#'+editModal).find('tbody')
 				.append(
+					//New Row
 					$(document.createElement('tr'))
 						.attr('id',i+'TagRow')
 						.append(
+							//Labeø
 							$(document.createElement('td'))
 								.attr("style","font-weight:bold;")
 								.attr('id',i+'ExistingTagField')
@@ -411,6 +413,7 @@ function fillEditModal(data,editModal) {
 										.text(i))
 								.append(" :"))
 						.append(
+							//Value
 							$(document.createElement('td'))
 								.attr('id',i+'TagValue')
 								.append(
@@ -419,6 +422,7 @@ function fillEditModal(data,editModal) {
 										.attr("value",element))	
 								.append(' ')
 								.append(
+									//Remove Button
 									$(document.createElement('b'))
 										.attr("class","btn btn-danger")
 										.css("font-size","16px")
@@ -492,6 +496,19 @@ function rewriteDescr(data,tableDiv) {
 	$('#'+tableDiv).dataTable().$("div[rel=popover]").popover({placement:'right'});
 
 }
+
+//*********************************
+// Delete Modal functions
+//**********************************
+
+//Fill delete Modal
+function getDeleteInfos (sensorId,row,modalDiv,table) {
+	$('#'+modalDiv).find('h2').text("Delete " + sensorId + " ?");
+	$('#'+modalDiv).find('#delete').unbind('click').click( function () {
+		removeComposite(getURL(getTopology(),'registry','/sensapp/registry/composite/sensors/'+sensorId),row,table)
+	});
+}
+
 
 //*********************************
 // Get JSON functions

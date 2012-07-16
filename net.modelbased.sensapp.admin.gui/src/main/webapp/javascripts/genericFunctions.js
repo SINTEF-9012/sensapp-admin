@@ -13,18 +13,31 @@ function timeStampToDate (timestamp) {
 
 }
 
+//get GET values
+function getQuerystring(key, default_)
+{
+  if (default_==null) default_=""; 
+  key = key.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+  var regex = new RegExp("[\\?&]"+key+"=([^&#]*)");
+  var qs = regex.exec(window.location.href);
+  if(qs == null)
+    return default_;
+  else
+    return qs[1];
+}
+
 //Add Link to Raw Data
-function createNameColumn(sensorId,type) {
+function createNameColumn(sensorId,url) {
 	return $(document.createElement('div'))
 			.append(
 				$(document.createElement('a'))
 					.attr("id",sensorId)
 					.attr("rel","tooltip")
 					.attr("title","View raw data")
-					.attr("href","raw.html?sensor="+sensorId+"&type="+type)
+					.attr("href","raw.html?url="+url)
 					.attr("target","_blank")
 					.text(sensorId)
-			);
+			);			
 }
 
 //Insert Tags in Description
@@ -246,7 +259,7 @@ function tableToJqueryDataTable (data,columns,div,sorting) {
 						}
 					}
 				}
-			} );
+			});
 	$(document).ready(function() {
 		$("#"+div).dataTable({
 			"aaData": data,	
@@ -314,4 +327,41 @@ function sortByTime(a, b){
   var aTime = a[0];
   var bTime = b[0]; 
   return ((aTime < bTime) ? -1 : ((aTime > bTime) ? 1 : 0));
+}
+
+function senmlToCSV (jsonData) {
+	
+	var csv="";
+	if(typeof jsonData.e!='undefined') {
+		if(jsonData.bt=='undefined') {
+			jsonData.bt=0;
+		}
+		if(jsonData.e[0].v!='undefined') {
+			$.each(jsonData.e, function(i,element) {
+				csv+='"'+element.t+jsonData.bt+'","'+element.v+'"<br>';
+			});
+		}
+		else {
+			if(jsonData.e[0].sv!='undefined') {
+				$.each(jsonData.e, function(i,element) {
+					csv+='"'+element.t+jsonData.bt+'","'+element.sv+'"<br>';
+				});
+			}
+			else {
+				if(jsonData.e[0].bv!='undefined') {
+					$.each(jsonData.e, function(i,element) {
+						csv+='"'+element.t+jsonData.bt+'","'+element.bv+'"<br>';
+					});
+				}
+				else {
+					if(jsonData.e[0].s!='undefined') {
+						$.each(jsonData.e, function(i,element) {
+							csv+='"'+element.t+jsonData.bt+'","'+element.s+'"<br>';
+						});
+					}
+				}
+			}
+		}
+	}
+	return csv;
 }

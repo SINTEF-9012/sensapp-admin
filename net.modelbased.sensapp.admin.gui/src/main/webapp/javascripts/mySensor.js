@@ -70,6 +70,7 @@ function initButtons(sensor,div,navBarId){
 		$(this).closest('li').attr('class','active');
 
 	});
+	//Datatable display
 	$('#'+navBarId).find('#datatable').click(function () {
 		$('#'+div).find('#admin').hide();
 		$('#'+div).find('#datatable').show();
@@ -83,6 +84,7 @@ function initButtons(sensor,div,navBarId){
 			displayRawData(div,jsonRawData[0]);
 		}
 	});
+	//Chart display
 	$('#'+navBarId).find('#chart').click(function () {
 		$('#'+div).find('#admin').hide();
 		$('#'+div).find('#datatable').hide();
@@ -96,7 +98,6 @@ function initButtons(sensor,div,navBarId){
 			displayRawTimeSerie(div,jsonRawData[0]);
 		}
 	});
-	//
 }
 	//*********************************
 	// Edit Modal Functions
@@ -118,6 +119,69 @@ function initButtons(sensor,div,navBarId){
 		});	
 	}
 
+	 function fillInputValues(data,div) {
+
+		//title
+		$('#'+div).find('#title').append(data.id);
+
+		//fields
+		$('#'+div).find('#id').attr('value',data.id);
+		if(typeof data.descr !='undefined'){
+			$('#'+div).find('#descr').attr('value',data.descr);
+		}
+		$('#'+div).find('#creation_date').attr('value', timeStampToDate(data.creation_date));
+		$('#'+div).find('#kind').attr('value',data.backend.kind);
+		
+		if(typeof data.infos.update_time != 'undefined'){
+			$('#'+div).find('#update_time').attr('value',data.infos.update_time);
+		}
+		if(typeof data.infos.loc != 'undefined'){
+			if(typeof data.infos.loc.longitude != 'undefined') {
+				$('#'+div).find('#longitude').attr('value',data.infos.loc.longitude);
+			}
+			if(typeof data.infos.loc.latitude != 'undefined') {
+				$('#'+div).find('#latitude').attr('value',data.infos.loc.latitude);
+			}
+		}
+		
+		//tags
+		if(typeof data.infos.tags != 'undefined'){
+			$.each(data.infos.tags, function(i,element) {
+				$('#'+div).find('#form').find('tbody')
+					.append(
+						$(document.createElement('tr'))
+							.attr('id',i+'TagRow')
+							.append(
+								$(document.createElement('td'))
+									.attr("style","font-weight:bold;")
+									.attr('id',i+'ExistingTagField')
+									.append(
+										$(document.createElement('span'))
+											.text(i))
+									.append(" :"))
+							.append(
+								$(document.createElement('td'))
+									.attr('id',i+'TagValue')
+									.append(
+										$(document.createElement('input'))
+											.attr("class","input-medium search-query")
+											.attr("value",element))	
+									.append(' ')
+									.append(
+										$(document.createElement('b'))
+											.attr("class","btn btn-danger")
+											.css("font-size","16px")
+											.unbind('click').click( function () {
+												$(this).closest('tr').remove();
+											})
+											.html("&times;"))
+							)
+					);
+			});
+		}
+	}	
+	
+	//called when updating a sensor
 	function updateSensor(id,formDiv,tableDiv) {
 		$.ajax({
 			type: "put",
@@ -164,64 +228,6 @@ function initButtons(sensor,div,navBarId){
 		$('#'+tableDiv).find("tbody").find("tr").eq(rowId).find("td").eq(colId).html(createDescriptionColumn(data,"sensor").html());
 		$("div[rel=popover]").popover({placement:'right'})		
 
-	}
-	 
-	 function fillInputValues(data,div) {
-
-		$('#'+div).find('#title').append(data.id);
-
-		$('#'+div).find('#id').attr('value',data.id);
-		if(typeof data.descr !='undefined'){
-			$('#'+div).find('#descr').attr('value',data.descr);
-		}
-		$('#'+div).find('#creation_date').attr('value', timeStampToDate(data.creation_date));
-		$('#'+div).find('#kind').attr('value',data.backend.kind);
-		
-		if(typeof data.infos.update_time != 'undefined'){
-			$('#'+div).find('#update_time').attr('value',data.infos.update_time);
-		}
-		if(typeof data.infos.loc != 'undefined'){
-			if(typeof data.infos.loc.longitude != 'undefined') {
-				$('#'+div).find('#longitude').attr('value',data.infos.loc.longitude);
-			}
-			if(typeof data.infos.loc.latitude != 'undefined') {
-				$('#'+div).find('#latitude').attr('value',data.infos.loc.latitude);
-			}
-		}
-		if(typeof data.infos.tags != 'undefined'){
-			$.each(data.infos.tags, function(i,element) {
-				$('#'+div).find('#form').find('tbody')
-					.append(
-						$(document.createElement('tr'))
-							.attr('id',i+'TagRow')
-							.append(
-								$(document.createElement('td'))
-									.attr("style","font-weight:bold;")
-									.attr('id',i+'ExistingTagField')
-									.append(
-										$(document.createElement('span'))
-											.text(i))
-									.append(" :"))
-							.append(
-								$(document.createElement('td'))
-									.attr('id',i+'TagValue')
-									.append(
-										$(document.createElement('input'))
-											.attr("class","input-medium search-query")
-											.attr("value",element))	
-									.append(' ')
-									.append(
-										$(document.createElement('b'))
-											.attr("class","btn btn-danger")
-											.css("font-size","16px")
-											.unbind('click').click( function () {
-												$(this).closest('tr').remove();
-											})
-											.html("&times;"))
-							)
-					);
-			});
-		}
 	}
 
 	//Called When leaving the modal
@@ -368,55 +374,30 @@ function displayRawData(div,data) {
 
 	if($('#'+div).find('#datatable').find('.dataTables_empty').size()>0) {
 		var dataArray = new Array();
-		//Check out the kind of data
+		//Check out the kind of data		
 		if(typeof data.e!='undefined') {
+			if(typeof data.bt=='undefined') {
+				data.bt = 0;
+			}
 			if(typeof data.e[0].v!='undefined') {
-				if(typeof data.bt=='undefined') {
-					$.each(data.e, function (i,element) {
-						dataArray.push( [timeStampToDate(element.t),element.v + " " + element.u] );
-					});
-				}
-				else {
-					$.each(data.e, function (i,element) {
-						dataArray.push( [timeStampToDate(element.t+data.bt),element.v + " " + element.u] );
-					});
-				}
+				$.each(data.e, function (i,element) {
+					dataArray.push( [timeStampToDate(element.t),element.v + " " + element.u] );
+				});
 			} else { 
 				if (typeof data.e[0].sv!='undefined') {
-					if(typeof data.bt=='undefined') {
-						$.each(data.e, function (i,element) {
-							dataArray.push( [timeStampToDate(element.t),element.sv + " " + element.u] );
-						});
-					}
-					else {
-						$.each(data.e, function (i,element) {
-							dataArray.push( [timeStampToDate(element.t+data.bt),element.sv + " " + element.u] );
-						});
-					}
+					$.each(data.e, function (i,element) {
+						dataArray.push( [timeStampToDate(element.t+data.bt),element.sv + " " + element.u] );
+					});
 				} else { 
 					if (typeof data.e[0].bv!='undefined') {
-						if(typeof data.bt=='undefined') {
-							$.each(data.e, function (i,element) {
-								dataArray.push( [timeStampToDate(element.t),element.bv] );
-							});
-						}
-						else {
-							$.each(data.e, function (i,element) {
-								dataArray.push( [timeStampToDate(element.t+data.bt),element.bv] );
-							});
-						}
+						$.each(data.e, function (i,element) {
+							dataArray.push( [timeStampToDate(element.t+data.bt),element.bv] );
+						});
 					} else {
 						if (typeof data.e[0].s!='undefined') {
-							if(typeof data.bt=='undefined') {
-								$.each(data.e, function (i,element) {
-									dataArray.push( [timeStampToDate(element.t),element.bv] );
-								});
-							}
-							else {
-								$.each(data.e, function (i,element) {
-									dataArray.push([timeStampToDate(element.t+data.bt),element.bv]);
-								});
-							}
+							$.each(data.e, function (i,element) {
+								dataArray.push([timeStampToDate(element.t+data.bt),element.bv]);
+							});
 						}
 					}
 				}

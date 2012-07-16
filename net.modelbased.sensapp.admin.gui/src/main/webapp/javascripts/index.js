@@ -29,7 +29,7 @@ function displayAllSensors(data,table) {
 	
 	$.each(data,function (i,sensor) {
 
-		sensorArray.push([createNameColumn(sensor.id,"sensor").html(),
+		sensorArray.push([createNameColumn(sensor.id,getURL(getTopology(),"registry","/sensapp/registry/sensors/"+sensor.id)).html(),
 						  createDescriptionColumn(sensor,"sensor").html(),
 						  timeStampToDate(sensor.creation_date),
 						  createSensorActions(sensor).html()]);
@@ -37,6 +37,7 @@ function displayAllSensors(data,table) {
 	tableToJqueryDataTable (sensorArray,sensorColumns,table);
 }
 
+//Called when adding new Sensor
 function addRowToSensorDataTable(sensor,sensorTable) {
 	$('#'+sensorTable).dataTable().fnAddData( [
 		createNameColumn(sensor.id,"sensor").html(),
@@ -191,8 +192,10 @@ function rewriteDescr(data,tableDiv) {
  
  function fillInputValues(data,div) {
 
+	//title
 	$('#'+div).find('#title').append(data.id);
 
+	//Field Values
 	$('#'+div).find('#id').attr('value',data.id);
 	if(typeof data.descr !='undefined'){
 		$('#'+div).find('#descr').attr('value',data.descr);
@@ -211,13 +214,17 @@ function rewriteDescr(data,tableDiv) {
 			$('#'+div).find('#latitude').attr('value',data.infos.loc.latitude);
 		}
 	}
+	
+	//Tags
 	if(typeof data.infos.tags != 'undefined'){
 		$.each(data.infos.tags, function(i,element) {
 			$('#'+div).find('#form').find('tbody')
 				.append(
+					//New Row
 					$(document.createElement('tr'))
 						.attr('id',i+'TagRow')
 						.append(
+							//Label
 							$(document.createElement('td'))
 								.attr("style","font-weight:bold;")
 								.attr('id',i+'ExistingTagField')
@@ -225,6 +232,7 @@ function rewriteDescr(data,tableDiv) {
 									$(document.createElement('span'))
 										.text(i))
 								.append(" :"))
+						//Value
 						.append(
 							$(document.createElement('td'))
 								.attr('id',i+'TagValue')
@@ -234,6 +242,7 @@ function rewriteDescr(data,tableDiv) {
 										.attr("value",element))	
 								.append(' ')
 								.append(
+									//Delete button
 									$(document.createElement('b'))
 										.attr("class","btn btn-danger")
 										.css("font-size","16px")
