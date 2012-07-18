@@ -13,6 +13,26 @@ function timeStampToDate (timestamp) {
 
 }
 
+function degreeToDouble(degree) {
+
+	split=degree.split(" ");
+	
+	if(typeof split[1] == 'undefined') {
+		split[1]=0;
+	}
+	if(typeof split[2] == 'undefined') {
+		split[2]=0;
+	}
+	if(typeof split[3] == 'undefined') {
+		split[3]=0;
+	}
+	var doubleValue=parseFloat(split[1])+parseFloat(split[2])/60+parseFloat(split[3])/3600;
+	if(split[0]=="S" || split[0]=="W") {
+		doubleValue = -doubleValue;
+	}
+	return doubleValue;
+}
+
 //get GET values
 function getQuerystring(key, default_)
 {

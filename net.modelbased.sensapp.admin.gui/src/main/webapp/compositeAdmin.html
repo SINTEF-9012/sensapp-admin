@@ -228,7 +228,7 @@
 		currentComposite = "";
 		tableToJqueryDataTable ([],[{"sTitle":"Name"},{"sTitle":"Description"},{"sTitle":"Actions"}],'containedSensorTable');
 		tableToJqueryDataTable ([],[{"sTitle":"Name"},{"sTitle":"Description"},{"sTitle":"Actions"}],'sensorTable');
-		getAllComposite(getURL(getTopology(),"registry","/sensapp/registry/composite/sensors")+"?flatten=true","compositeTable","containedSensorTable","sensorTable");
+		getAllComposite(getURL(getTopology(),"registry","/sensapp/registry/composite/sensors")+"?flatten=true","composite","contained","all");
 		$(document).ready(function () {
 			$("[rel=tooltip]").tooltip({placement:'left'});
 		});

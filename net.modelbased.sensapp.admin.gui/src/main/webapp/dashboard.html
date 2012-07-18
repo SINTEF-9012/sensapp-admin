@@ -1,16 +1,15 @@
 
 <!DOCTYPE html>
-<link rel="stylesheet" type="text/css" href="bootstrap/css/DT_bootstrap.css">
+<link rel="stylesheet" type="text/css" href="./bootstrap/css/DT_bootstrap.css">
 
 <html lang="en">
 <head>
-	<script src="http://code.jquery.com/jquery-latest.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
 	<meta charset="utf-8">
 	<title>SensApp</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="description" content="">
-	<meta name="author" content="">
-	<link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="./bootstrap/css/bootstrap.css">
 	<style type="text/css">
 		body {
 			padding-top: 60px;
@@ -24,7 +23,7 @@
 				font-size:14px;
 		}
 	</style>
-	<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="./bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 </head>
 
 <body>
@@ -115,9 +114,9 @@
 	<hr>
 		</div>
     </div>
-	<div id="display" class="container-fluid">
+	<div id="display" class="container-fluid" hidden>
 		<button id="back" class="btn" onclick="$('#display').find('#data').empty();$('#display').hide();$('#visualisation').show();">Back</button>
-		<button id="save" class="btn">Get Javascript</button>
+		<button id="save" class="btn" href="#jsModal" data-toggle="modal" onclick="getJavascript('jsModal')">Get Javascript</button>
 		<div id="data">
 		</div> 
 	<hr>
@@ -172,6 +171,17 @@
 			<a href="#" class="btn" data-dismiss="modal">Cancel</a>  
 		</div>  
 	</div> 	
+
+<!---------------------
+-Get Javascript Modal div--
+---------------------->	
+	<div id="jsModal" class="modal hide fade in" style="display: none; ">
+		<div class="modal-header">  
+			<a class="close" onClick="clearVisualisationModal('add-Visualisation')"  data-dismiss="modal">&times;</a>  
+		</div>  
+		<div id="code" class="modal-body">
+		</div>
+	</div> 	
 	
 <!---------------------
 -JavaScripts--
@@ -179,10 +189,11 @@
 	<script type="text/javascript" src="./DataTables-1.9.1/media/js/jquery.dataTables.js"></script>
 	<script type="text/javascript" src="./javascripts/genericFunctions.js"></script>
 	<script type="text/javascript" src="./javascripts/topology.js"></script>
+
 	<script type="text/javascript" src="./javascripts/dashboard.js"></script>
-	<script type="text/javascript" charset="utf-8" language="javascript" src="bootstrap/js/DT_bootstrap.js"></script>
-	<script src="./highstock/js/highstock.js"></script>
-	<script src="./highstock/js/modules/exporting.js"></script>	
+	<script type="text/javascript" charset="utf-8" language="javascript" src="./bootstrap/js/DT_bootstrap.js"></script>
+	<script type="text/javascript" src="./highstock/js/highstock.js"></script>
+	<script type="text/javascript" src="./highstock/js/modules/exporting.js"></script>	
 	<script>
 	initVisualisation('visualisation')
 	getAllSensors ('sensors');
@@ -195,17 +206,17 @@
 	});
 	</script>
     <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBqAcd9tICH9qmHGL3ieuYoz3WSITCsCic&sensor=false"></script>
-    <script src="bootstrap/js/bootstrap-transition.js"></script>
-    <script src="bootstrap/js/bootstrap-alert.js"></script>
-    <script src="bootstrap/js/bootstrap-modal.js"></script>
-    <script src="bootstrap/js/bootstrap-dropdown.js"></script>
-    <script src="bootstrap/js/bootstrap-scrollspy.js"></script>
-    <script src="bootstrap/js/bootstrap-tab.js"></script>
-    <script src="bootstrap/js/bootstrap-tooltip.js"></script>
-    <script src="bootstrap/js/bootstrap-popover.js"></script>
-    <script src="bootstrap/js/bootstrap-button.js"></script>
-    <script src="bootstrap/js/bootstrap-collapse.js"></script>
-    <script src="bootstrap/js/bootstrap-carousel.js"></script>
-    <script src="bootstrap/js/bootstrap-typeahead.js"></script>
+    <script type="text/javascript" src="./bootstrap/js/bootstrap-transition.js"></script>
+    <script type="text/javascript" src="./bootstrap/js/bootstrap-alert.js"></script>
+    <script type="text/javascript" src="./bootstrap/js/bootstrap-modal.js"></script>
+    <script type="text/javascript" src="./bootstrap/js/bootstrap-dropdown.js"></script>
+    <script type="text/javascript" src="./bootstrap/js/bootstrap-scrollspy.js"></script>
+    <script type="text/javascript" src="./bootstrap/js/bootstrap-tab.js"></script>
+    <script type="text/javascript" src="./bootstrap/js/bootstrap-tooltip.js"></script>
+    <script type="text/javascript" src="./bootstrap/js/bootstrap-popover.js"></script>
+    <script type="text/javascript" src="./bootstrap/js/bootstrap-button.js"></script>
+    <script type="text/javascript" src="./bootstrap/js/bootstrap-collapse.js"></script>
+    <script type="text/javascript" src="./bootstrap/js/bootstrap-carousel.js"></script>
+    <script type="text/javascript" src="./bootstrap/js/bootstrap-typeahead.js"></script>
   </body>
 </html>
