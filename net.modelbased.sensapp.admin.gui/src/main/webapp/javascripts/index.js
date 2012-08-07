@@ -144,7 +144,7 @@ function getMoreInputInfos(targetURL,div) {
 function updateSensor(id,formDiv,tableDiv) {
 	$.ajax({
 		type: "put",
-		url: getURL(getTopology(),"registry","/registry/sensors/"+id),
+		url: getURL(getTopology(),"registry","/sensapp/registry/sensors/"+id),
 		contentType: "application/json",
 		dataType:'json',
 		data: JSON.stringify(getSensorInfosToPut(formDiv)),
