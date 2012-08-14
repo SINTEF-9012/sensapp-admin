@@ -25,9 +25,9 @@
 
 		$('#'+div).find('#admin').find('tbody').find('tr')
 			.append(
-				$(document.createElement('td')).append(createNameColumn(sensor.id,"sensor")))
+				$(document.createElement('td')).append(createNameColumn(sensor.id)))
 			.append(
-				$(document.createElement('td')).append(createDescriptionColumn(sensor,"sensor")))
+				$(document.createElement('td')).append(createDescriptionColumn(sensor)))
 			.append(
 				$(document.createElement('td')).text(timeStampToDate(sensor.creation_date)))
 			.append(

@@ -45,14 +45,14 @@ function separateNotifiers(targetURL,allSensors,notifierTable,nonNotifierTable) 
 					}
 					// sensor is not in notifier Array
 					if(isNotifier==false) {
-						nonNotifiersArray.push([createNameColumn(sensor.id,getURL(getTopology(),"registry","/sensapp/registry/sensors/"+sensor.id)).html(),
+						nonNotifiersArray.push([createNameColumn(sensor.id).html(),
 												createDescriptionColumn(sensor,"sensor").html(),
 												timeStampToDate(sensor.creation_date),
 												createNonNotifierActions(sensor).html()]);
 					}
 					//sensor is in notifier Array
 					else {
-						notifiersArray.push([createNameColumn(sensor.id,getURL(getTopology(),"registry","/sensapp/notification/registered/"+sensor.id)).html(),
+						notifiersArray.push([createNameColumn(sensor.id).html(),
 							 createDescriptionColumn(sensor,"notifier").html(),
 							 timeStampToDate(sensor.creation_date),
 							 createNotifierActions(sensor,notifierTable,nonNotifierTable).html()]);
@@ -129,7 +129,7 @@ function createNonNotifierActions(sensor) {
  
 function addRowToNonNotifierDatable(sensor,nonNotifierTable) {
 	$('#'+nonNotifierTable).dataTable().fnAddData( [
-		createNameColumn(sensor.id,getURL(getTopology(),"registry","/sensapp/registry/sensors/"+sensor.id)).html(),
+		createNameColumn(sensor.id).html(),
 		createDescriptionColumn(sensor,"sensor").html(),
 		timeStampToDate(sensor.creation_date),
 		createNonNotifierActions(sensor).html()] );

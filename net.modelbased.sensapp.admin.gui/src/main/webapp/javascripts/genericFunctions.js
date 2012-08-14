@@ -4,11 +4,11 @@ function timeStampToDate (timestamp) {
    var yyyy = time.getFullYear().toString();
    var mm = (time.getUTCMonth()+1).toString(); // getMonth() is zero-based
    var dd  = time.getUTCDate().toString();
-   
+
 	var hh = time.getHours().toString();
  	var min = time.getMinutes().toString();
-	var ss = time.getSeconds().toString();	
-	
+	var ss = time.getSeconds().toString();
+
    return yyyy +"-"+(mm[1]?mm:"0"+mm[0]) +"-"+(dd[1]?dd:"0"+dd[0]) + " " + (hh[1]?hh:"0"+hh[0]) + ":" + (min[1]?min:"0"+min[0]) +":" + (ss[1]?ss:"0"+ss[0]);
 
 }
@@ -16,7 +16,7 @@ function timeStampToDate (timestamp) {
 function degreeToDouble(degree) {
 
 	split=degree.split(" ");
-	
+
 	if(typeof split[1] == 'undefined') {
 		split[1]=0;
 	}
@@ -36,7 +36,7 @@ function degreeToDouble(degree) {
 //get GET values
 function getQuerystring(key, default_)
 {
-  if (default_==null) default_=""; 
+  if (default_==null) default_="";
   key = key.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
   var regex = new RegExp("[\\?&]"+key+"=([^&#]*)");
   var qs = regex.exec(window.location.href);
@@ -47,17 +47,22 @@ function getQuerystring(key, default_)
 }
 
 //Add Link to Raw Data
-function createNameColumn(sensorId,url) {
+function createNameColumn(sensorId) {
 	return $(document.createElement('div'))
 			.append(
 				$(document.createElement('a'))
 					.attr("id",sensorId)
 					.attr("rel","tooltip")
-					.attr("title","View raw data")
-					.attr("href","raw.html?url="+url)
-					.attr("target","_blank")
+					.attr("href","#")
+					.attr('onclick', 'clickNameColumn(this);')
 					.text(sensorId)
-			);			
+			);
+}
+
+// Manage click on the name column
+function clickNameColumn(a) {
+	$(a).parents('tr').find('a.btn:first').click();
+	return false;
 }
 
 //Insert Tags in Description
@@ -65,7 +70,7 @@ function createDescriptionColumn(sensor,type) {
 
 	var popoverContent;
 	switch (type) {
-		case "sensor": 
+		case "sensor":
 				popoverContent = getPopoverContent(sensor);
 			break;
 		case "composite":
@@ -73,7 +78,7 @@ function createDescriptionColumn(sensor,type) {
 			break;
 		case "notifier":
 				popoverContent = getPopoverContent(sensor);
-			break;			
+			break;
 		default:
 			popoverContent = "";
 			break;
@@ -84,7 +89,7 @@ function createDescriptionColumn(sensor,type) {
 		text = sensor.descr;
 	else
 		text = "n.a.";
-	
+
 	if (popoverContent != "") {
 	var div = $(document.createElement('div'))
 					.attr("rel","popover")
@@ -135,7 +140,7 @@ function getCompositePopoverContent(sensor) {
 //Alert Messages
 function alertMessage(type,message,timeout) {
 	alertDiv = $(document.createElement('div'));
-			
+
 	switch (type) {
 		case "success":
 			alertDiv.attr("class","alert alert-success fade in")
@@ -152,14 +157,14 @@ function alertMessage(type,message,timeout) {
 		default:
 			break;
 	}
-	
+
 	alertDiv.append(
 			$(document.createElement('a'))
 				.attr("class","close")
 				.attr("data-dismiss","alert")
 				.html("&times;")
 		);
-	
+
 	$('#alert-div').append(alertDiv);
 	if(typeof timeout!='undefined')
 		window.setTimeout(function() { $('#alert-div').find(':contains('+message+')').remove(); }, timeout);
@@ -170,7 +175,7 @@ function removeRow(row,dataTable) {
 	var oTable = $('#'+dataTable).dataTable();
 	oTable.fnDeleteRow(oTable.fnGetPosition(row));
  }
- 
+
 //Resize the table
  function resizeDatatable(table) {
 	$('#'+table).dataTable().fnAdjustColumnSizing();
@@ -282,7 +287,7 @@ function tableToJqueryDataTable (data,columns,div,sorting) {
 			});
 	$(document).ready(function() {
 		$("#"+div).dataTable({
-			"aaData": data,	
+			"aaData": data,
 			"aaSorting": [[ 0, sorting ]],
 			"aoColumn": columns,
 			"sPaginationType": "bootstrap",
@@ -302,12 +307,12 @@ function SenMLToHighcharts(senMLData) {
 	if(typeof senMLData.e[0].v!='undefined') {
 		if(typeof senMLData.bt=='undefined') {
 			$.each(senMLData.e, function (i,element) {
-					highchartsData.push([element.t*1000,element.v]);			
+					highchartsData.push([element.t*1000,element.v]);
 			});
 		}
 		else {
 			$.each(senMLData.e, function (i,element) {
-					highchartsData.push([(element.t+senMLData.bt)*1000,element.v]);		
+					highchartsData.push([(element.t+senMLData.bt)*1000,element.v]);
 			});
 		}
 	} else {
@@ -320,8 +325,8 @@ function SenMLToHighcharts(senMLData) {
 					}
 					else {
 						val=0;
-					}					
-					highchartsData.push([element.t*1000,val]);			
+					}
+					highchartsData.push([element.t*1000,val]);
 			});
 		}
 			else {
@@ -332,8 +337,8 @@ function SenMLToHighcharts(senMLData) {
 					}
 					else {
 						val=0;
-					}					
-					highchartsData.push([(element.t+senMLData.bt)*1000,val]);			
+					}
+					highchartsData.push([(element.t+senMLData.bt)*1000,val]);
 				});
 			}
 		}
@@ -345,12 +350,12 @@ function SenMLToHighcharts(senMLData) {
 
 function sortByTime(a, b){
   var aTime = a[0];
-  var bTime = b[0]; 
+  var bTime = b[0];
   return ((aTime < bTime) ? -1 : ((aTime > bTime) ? 1 : 0));
 }
 
 function senmlToCSV (jsonData) {
-	
+
 	var csv="";
 	if(typeof jsonData.e!='undefined') {
 		if(jsonData.bt=='undefined') {

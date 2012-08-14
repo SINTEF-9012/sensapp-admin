@@ -6,11 +6,11 @@ function getCompositeInformations(targetURL,compositeId,containedDiv,sensorDiv) 
 		url: targetURL,
 		contentType: "application/json",
 		dataType:'json',
-		success: 
+		success:
 			function (allSensorsURL, textStatus, jqXHR) {
-				separateContained(getURL(getTopology(),"registry","/sensapp/registry/composite/sensors/"+compositeId),allSensorsURL,containedDiv,sensorDiv);	
+				separateContained(getURL(getTopology(),"registry","/sensapp/registry/composite/sensors/"+compositeId),allSensorsURL,containedDiv,sensorDiv);
 			},
-		error: 
+		error:
 			function (jqXHR, textStatus, errorThrown) {
 				alertMessage("error",errorThrown,5000);
 			}
@@ -24,14 +24,14 @@ function separateContained(targetURL,allSensorsURL,containedDiv,sensorDiv) {
 		url: targetURL,
 		contentType: "application/json",
 		dataType:'json',
-		success: 
+		success:
 			function (compositeInfos, textStatus, jqXHR) {
 				var containedArray = new Array();
 				var othersArray = new Array();
 				var counter = 0;
 				$.each(allSensorsURL, function (i,sensorURL) {
 					if(compositeInfos.sensors.indexOf(sensorURL)==-1) {
-						getPushOtherSensorInfos(sensorURL,othersArray,containedDiv,sensorDiv);						
+						getPushOtherSensorInfos(sensorURL,othersArray,containedDiv,sensorDiv);
 					}
 					else {
 						containedList = compositeInfos.sensors;
@@ -39,17 +39,17 @@ function separateContained(targetURL,allSensorsURL,containedDiv,sensorDiv) {
 					}
 				});
 				$('#'+containedDiv).find('table').dataTable().fnClearTable();
-				$('#'+sensorDiv).find('table').dataTable().fnClearTable();						
+				$('#'+sensorDiv).find('table').dataTable().fnClearTable();
 				$('#'+containedDiv).find('table').dataTable().fnAddData(containedArray);
 				$('#'+sensorDiv).find('table').dataTable().fnAddData(othersArray);
 				$('#'+containedDiv).find('table').dataTable().$("div[rel=popover]").popover({placement:'right'});
 				$('#'+sensorDiv).find('table').dataTable().$("div[rel=popover]").popover({placement:'right'});
 			},
-		error: 
+		error:
 			function (jqXHR, textStatus, errorThrown) {
 				alertMessage("error",errorThrown,5000);
 			}
-	});	
+	});
 
 }
 
@@ -60,11 +60,11 @@ function getPushOtherSensorInfos(targetURL,othersArray,containedDiv,sensorDiv) {
 		url: targetURL,
 		contentType: "application/json",
 		dataType:'json',
-		success: 
+		success:
 			function (sensor, textStatus, jqXHR) {
 				addRowToSensorDatatable(sensor,containedDiv,sensorDiv);
 			},
-		error: 
+		error:
 			function (jqXHR, textStatus, errorThrown) {
 				alertMessage("error",errorThrown,5000);
 			}
@@ -78,11 +78,11 @@ function getPushContainedSensorInfos(targetURL,containedArray,containedDiv,senso
 		url: targetURL,
 		contentType: "application/json",
 		dataType:'json',
-		success: 
+		success:
 			function (sensor, textStatus, jqXHR) {
 				addRowToContainedDataTable (sensor,containedDiv,sensorDiv);
 			},
-		error: 
+		error:
 			function (jqXHR, textStatus, errorThrown) {
 				alertMessage("error",errorThrown,5000);
 			}
@@ -96,7 +96,7 @@ function getPushContainedSensorInfos(targetURL,containedArray,containedDiv,senso
 
 //Init Main Page
 function getAllComposite(targetURL,compositeDiv,containedDiv,sensorDiv) {
-	
+
 	$.ajax({
 		type: "get",
 		url: targetURL,
@@ -105,31 +105,32 @@ function getAllComposite(targetURL,compositeDiv,containedDiv,sensorDiv) {
 		success: function (data,textStatus,jqXHR) {
 				if (data.length!=0) {
 					displayAllComposite(data,compositeDiv,containedDiv,sensorDiv);
-				}		
+				}
 		},
-		error: 
+		error:
 			function (jqXHR, textStatus, errorThrown) {
 				alertMessage("error",errorThrown,5000);
 			}
 	});
 
 }
- 
+
 function displayAllComposite(data,compositeDiv,containedDiv,sensorDiv) {
 
 	var compositeArray = new Array();
 	var compositeColumns = [{"sTitle":"Name"},{"sTitle":"Description"},{"sTitle":"Actions"}];
 
 	$.each(data,function (i,sensor) {
-		compositeArray.push([createNameColumn(sensor.id,getURL(getTopology(),"registry","/sensapp/registry/composite/sensors/"+sensor.id)).html(),
+		compositeArray.push([createNameColumn(sensor.id).html(),
 							 createDescriptionColumn(sensor,"composite").html(),
-							 createCompositeActions(sensor,compositeDiv,containedDiv,sensorDiv).html()]);
+							 createCompositeActions(sensor,compositeDiv,containedDiv,sensorDiv,
+							 	getURL(getTopology(),"registry","/sensapp/registry/composite/sensors/"+sensor.id)).html()]);
 	});
 
 	tableToJqueryDataTable(compositeArray,compositeColumns,$('#'+compositeDiv).find('table').attr('id'));
 }
 
-function createCompositeActions(sensor,compositeDiv,containedDiv,sensorDiv) {
+function createCompositeActions(sensor,compositeDiv,containedDiv,sensorDiv, rawUrl) {
 	return $(document.createElement('td'))
 			.append(
 				//View Button
@@ -148,8 +149,19 @@ function createCompositeActions(sensor,compositeDiv,containedDiv,sensorDiv) {
 					.attr("onclick","getEditInfos(getURL(getTopology(),'registry','/sensapp/registry/composite/sensors/"+sensor.id+"'),'edit-Composite')")
 					.text("Edit")
 			)
-			.append(' ')					
-			.append(	
+			.append(' ')
+			.append(
+				//Raw Button
+				$(document.createElement('a'))
+					.attr("href","raw.html?url="+rawUrl)
+					.attr("rel","tooltip")
+					.attr("title","View raw data")
+					.attr("class","btn")
+					.attr("target","_blank")
+					.text("Raw")
+			)
+			.append(' ')
+			.append(
 				//Remove Button
 				$(document.createElement('a'))
 					.attr("class","btn btn-danger")
@@ -157,7 +169,7 @@ function createCompositeActions(sensor,compositeDiv,containedDiv,sensorDiv) {
 					.attr("data-toggle","modal")
 					.attr("onclick","getDeleteInfos('"+sensor.id+"',this.parentNode.parentNode,'delete-Sensor','"+compositeDiv+"')")
 					.html("<b style='font-size:16px'>&times;</b>")
-			);	
+			);
 }
 
 //Used in Manage Content OnClick
@@ -173,13 +185,13 @@ function dispatchSensors (sensorId,compositeDiv,containedDiv,sensorDiv) {
 //Called when adding a new Composite
 function addRowToCompositeDatable(sensor,compositeDiv,containedDiv,sensorDiv) {
 	$('#'+compositeDiv).find('table').dataTable().fnAddData( [
-		createNameColumn(sensor.id,"composite").html(),
+		createNameColumn(sensor.id).html(),
 		createDescriptionColumn(sensor,"composite").html(),
 		createCompositeActions(sensor,compositeDiv,sensorDiv).html()] );
 }
 
 function removeComposite(targetURL,row,compositeDiv) {
-	
+
 	$.ajax({
 		type: "delete",
 		url: targetURL,
@@ -187,7 +199,7 @@ function removeComposite(targetURL,row,compositeDiv) {
 			removeRow(row,$('#'+compositeDiv).find('table').attr('id'));
 			alertMessage("success","Sensor deleted",5000);
 		},
-		error: 
+		error:
 			function (jqXHR, textStatus, errorThrown) {
 				alertMessage("error",errorThrown,5000);
 			}
@@ -217,9 +229,9 @@ function addRowToContainedDataTableById(targetURL,containedDiv,sensorDiv) {
 		url: targetURL,
 		success: function (data,textStatus,jqXHR) {
 				addRowToContainedDataTable(data,containedDiv,sensorDiv);
-				$('#'+containedDiv).find('table').dataTable().$("div[rel=popover]").popover({placement:'right'});			
+				$('#'+containedDiv).find('table').dataTable().$("div[rel=popover]").popover({placement:'right'});
 		},
-		error: 
+		error:
 			function (jqXHR, textStatus, errorThrown) {
 				alertMessage("error",errorThrown,5000);
 			}
@@ -251,14 +263,14 @@ function deleteSelectedSensors(targetURL,containedDiv) {
 			selectedList = new Array();
 			alertMessage("success","Selected sensors are removed from composite",5000);
 		},
-		error: 
+		error:
 			function (jqXHR, textStatus, errorThrown) {
 				alertMessage("error",errorThrown,5000);
 			}
 	});
 }
 
-function deleteSelectedRows(containedDiv) {	
+function deleteSelectedRows(containedDiv) {
 	$.each($('#'+containedDiv).find('table').find(':checked'), function (i,element) {
 		removeRow($(element).closest('tr').get(0),$('#'+containedDiv).find('table').attr("id"));
 	});
@@ -275,9 +287,9 @@ function addRowToSensorDatatableById(targetURL,containedDiv,sensorDiv) {
 		url: targetURL,
 		success: function (data,textStatus,jqXHR) {
 			addRowToSensorDatatable(data,containedDiv,sensorDiv);
-			$('#'+sensorDiv).find('table').dataTable().$("div[rel=popover]").popover({placement:'right'});				
+			$('#'+sensorDiv).find('table').dataTable().$("div[rel=popover]").popover({placement:'right'});
 		},
-		error: 
+		error:
 			function (jqXHR, textStatus, errorThrown) {
 				alertMessage("error",errorThrown,5000);
 			}
@@ -315,7 +327,7 @@ function putSensors(targetURL) {
 		success: function (data,textStatus,jqXHR) {
 			alertMessage("success","Sub-sensors updated",5000);
 		},
-		error: 
+		error:
 			function (jqXHR, textStatus, errorThrown) {
 				alertMessage("error",errorThrown,5000);
 			}
@@ -356,7 +368,7 @@ function postComposite(targetURL,postData,compositeDiv,containedDiv,sensorDiv) {
 			$('#'+compositeDiv).find('table').dataTable().$("div[rel=popover]").popover({placement:'right'});
 			alertMessage("success",postData.id +" created",5000);
 		},
-		error: 
+		error:
 			function (jqXHR, textStatus, errorThrown) {
 				alertMessage("error",errorThrown,5000);
 			}
@@ -378,15 +390,15 @@ function getEditInfos(targetURL,editModal) {
 	$.ajax({
 		type: "get",
 		url: targetURL,
-		success: 
+		success:
 			function (data, textStatus, jqXHR) {
 				fillEditModal(data,editModal);
 			},
-		error: 
+		error:
 			function (jqXHR, textStatus, errorThrown) {
 				alertMessage("error",errorThrown,5000);
 			}
-	});	
+	});
 }
 
 function fillEditModal(data,editModal) {
@@ -397,7 +409,7 @@ function fillEditModal(data,editModal) {
 	if(typeof data.descr !='undefined'){
 		$('#'+editModal).find('#descr').attr('value',data.descr);
 	}
-	
+
 	if(typeof data.tags != 'undefined'){
 		$.each(data.tags, function(i,element) {
 			$('#'+editModal).find('tbody')
@@ -421,7 +433,7 @@ function fillEditModal(data,editModal) {
 								.append(
 									$(document.createElement('input'))
 										.attr("class","input-medium search-query")
-										.attr("value",element))	
+										.attr("value",element))
 								.append(' ')
 								.append(
 									//Remove Button
@@ -449,7 +461,7 @@ function editComposite(modalDiv,tableDiv) {
 		contentType: "application/json",
 		dataType:'json',
 		data: JSON.stringify({"tags":getTags(modalDiv)}),
-		success: 
+		success:
 			function (data, textStatus, jqXHR) {
 				updateSensorDescr(targetURL,modalDiv,tableDiv);
 				clearEditModal(modalDiv);
@@ -464,11 +476,11 @@ function editComposite(modalDiv,tableDiv) {
 
 function clearEditModal(modalDiv) {
 	$('#'+modalDiv).find('#title').empty();
-	$('#'+modalDiv).find('#descr').val("");	
+	$('#'+modalDiv).find('#descr').val("");
 	$('#'+modalDiv).find('tr[id$="TagRow"]').remove();
 }
 
-function updateSensorDescr (targetURL,modalDiv,tableDiv) {		 
+function updateSensorDescr (targetURL,modalDiv,tableDiv) {
 
 	$.ajax({
 		type: "put",
@@ -476,7 +488,7 @@ function updateSensorDescr (targetURL,modalDiv,tableDiv) {
 		contentType: "application/json",
 		dataType:'json',
 		data: JSON.stringify(getDescr(modalDiv)),
-		success: 
+		success:
 			function (data, textStatus, jqXHR) {
 				rewriteDescr(data,tableDiv);
 				clearEditModal('edit-Sensor');
