@@ -27,12 +27,10 @@ function displayArray (data) {
 			display+='<div>"'+element+'"</div>';
 		}
 		else {
-			if (element instanceof Array) {
-				display+='"'+i+'"';			
+			if (element instanceof Array) {	
 				displayArray(element,"array");
 			}
 			else {
-				display+='"'+i+'":';		
 				displayCollection(element,"collection");	
 			}
 
