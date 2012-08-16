@@ -499,128 +499,134 @@ function generateMap(visuName,sensors,displayDiv) {
 		});	
 	}
 	
-	function createMap(senMLArray,visuName,displayDiv) {
-
-		var latSensorId;
-		var lonSensorId;
+    function createMap(senMLArray,visuName,displayDiv) {
 	
-		//catch errors
-		if(typeof senMLArray[0].e == 'undefined' || typeof senMLArray[1].e == 'undefined') {
-			alertMessage("error","Missing data",5000);
-			return null;
-		}
-		if(senMLArray[0].e[0].u=='lon') {
-			lonSensorId = 0;
-			if(senMLArray[1].e[0].u=='lat') {
-				latSensorId = 1;
-			}
-			else {
-				alertMessage("error","No latitude Data",5000);
-				return null;
-			}
-		}
-		else {
-			if(senMLArray[0].e[0].u=='lat') {
-				latSensorId = 0;
-				if(senMLArray[1].e[0].u=='lon') {
-					lonSensorId = 1;				
-				}
-				else {
-					alertMessage("error","No longitude Data",5000);
-					return null;
-				}
-			}
-			else {
-				alertMessage("error","Sensor" + senMLArray[0].bn + " not valid",5000);
-				return null;				
-			}
-		}
-		if (senMLArray[0].e.length!=senMLArray[1].e.length) {
-			alertMessage("error","Number of data does not match",5000);
-			return null;			
-		}
-
-		var lonArray = [];
-		var latArray = [];
-
-		if(typeof senMLArray[lonSensorId].e[0].v!='undefined') {
-			lonArray = senMLArray[lonSensorId].e[0].v
-		} 
-		else {
-			if(typeof senMLArray[lonSensorId].e[0].sv!='undefined') {
-				$.each(senMLArray[lonSensorId].e,function(i,element) {
-					lonArray.push(degreeToDouble(element.sv));
-				});
-			}
-			else {
-				alertMessage("error","Sensor" + senMLArray[lonSensorId].bn + " not valid",5000);
-				return null;				
-			}
-		}
-		if(typeof senMLArray[latSensorId].e[0].v!='undefined') {
-			latArray = senMLArray[latSensorId].e[0].v
-		} 
-		else {
-			if(typeof senMLArray[latSensorId].e[0].sv!='undefined') {
-				$.each(senMLArray[latSensorId].e,function(i,element) {
-					latArray.push(degreeToDouble(element.sv));
-				});
-			}
-			else {
-				alertMessage("error","Sensor" + senMLArray[latSensorId].bn + " not valid",5000);
-				return null;				
-			}
-		}		
-		
-		var dataSize = lonArray.length;
-		var lastlat = latArray[dataSize-1];
-		var lastlon = lonArray[dataSize-1];
-		var firstlat = latArray[0];
-		var firstlon = lonArray[0];
-		var center = new google.maps.LatLng((firstlat+lastlat)/2, (lastlon+firstlon)/2);
-		var options = {
-			center: center,
-			zoom:2,
-			mapTypeId: google.maps.MapTypeId.ROADMAP,
-			scaleControl: true
-		};
-		var mapDiv = document.createElement('div');
-		$(mapDiv).css("height","400px");
-		var map = new google.maps.Map(mapDiv, options);
-		//polyligne
-		for(i=1;i<dataSize;i++){
-			var route = [];
-			route.push(new google.maps.LatLng(latArray[i-1], lonArray[i-1]));
-			route.push(new google.maps.LatLng(latArray[i], lonArray[i]));
-			var itinerary = new google.maps.Polyline({
-				path: route,
-				strokeOpacity: 1.0,
-				strokeColor: "#FF0000",
-				strokeWeight: 4
-			});
-
-			itinerary.setMap(map);
-		}
-
-		var start = new google.maps.LatLng(firstlat, firstlon);
-		var finish = new google.maps.LatLng(lastlat, lastlon);
-		var marker1 = new google.maps.Marker({
-			position: start,
-			map: map,
-			title: "Start"
-		});
-		var marker2 = new google.maps.Marker({
-			position: finish,
-			map: map,
-			title: "Finish"
-		});
-		var markerBounds = new google.maps.LatLngBounds();
-		markerBounds.extend(start);
-		markerBounds.extend(finish);
-		map.fitBounds(markerBounds);		
-
-		$('#'+displayDiv).find('#data').append(mapDiv);
+	var latSensorId;
+	var lonSensorId;
+	
+	//catch errors
+	if(typeof senMLArray[0].e == 'undefined' || typeof senMLArray[1].e == 'undefined') {
+	    alertMessage("error","Missing data",5000);
+	    return null;
 	}
+	if(senMLArray[0].e[0].u=='lon') {
+	    lonSensorId = 0;
+	    if(senMLArray[1].e[0].u=='lat') {
+		latSensorId = 1;
+	    }
+	    else {
+		alertMessage("error","No latitude Data",5000);
+		return null;
+	    }
+	}
+	else {
+	    if(senMLArray[0].e[0].u=='lat') {
+		latSensorId = 0;
+		if(senMLArray[1].e[0].u=='lon') {
+		    lonSensorId = 1;				
+		}
+		else {
+		    alertMessage("error","No longitude Data",5000);
+		    return null;
+		}
+	    }
+	    else {
+		alertMessage("error","Sensor" + senMLArray[0].bn + " not valid",5000);
+		return null;				
+	    }
+	}
+	if (senMLArray[0].e.length!=senMLArray[1].e.length) {
+	    alertMessage("error","Number of data does not match",5000);
+	    return null;			
+	}
+	
+	var lonArray = [];
+	var latArray = [];
+	
+	if(typeof senMLArray[lonSensorId].e[0].v!='undefined') {
+	    //lonArray = senMLArray[lonSensorId].e[0].v
+	    $.each(senMLArray[lonSensorId].e,function(i,element) {
+		lonArray.push(element.v);
+	    });
+	} 
+	else {
+	    if(typeof senMLArray[lonSensorId].e[0].sv!='undefined') {
+		$.each(senMLArray[lonSensorId].e,function(i,element) {
+		    lonArray.push(degreeToDouble(element.sv));
+		});
+	    }
+	    else {
+		alertMessage("error","Sensor" + senMLArray[lonSensorId].bn + " not valid",5000);
+		return null;				
+	    }
+	}
+	if(typeof senMLArray[latSensorId].e[0].v!='undefined') {
+	    $.each(senMLArray[latSensorId].e,function(i,element) {
+		    latArray.push(element.v);
+		});
+	} 
+	else {
+	    if(typeof senMLArray[latSensorId].e[0].sv!='undefined') {
+		$.each(senMLArray[latSensorId].e,function(i,element) {
+		    latArray.push(degreeToDouble(element.sv));
+		});
+	    }
+	    else {
+		alertMessage("error","Sensor" + senMLArray[latSensorId].bn + " not valid",5000);
+		return null;				
+	    }
+	}		
+	
+	// drawing of the map
+	var dataSize = lonArray.length;
+	var lastlat = latArray[dataSize-1];
+	var lastlon = lonArray[dataSize-1];
+	var firstlat = latArray[0];
+	var firstlon = lonArray[0];
+	var center = new google.maps.LatLng((firstlat+lastlat)/2, (lastlon+firstlon)/2);
+	var options = {
+	    center: center,
+	    zoom:2,
+	    mapTypeId: google.maps.MapTypeId.ROADMAP,
+	    scaleControl: true
+	};
+	var mapDiv = document.createElement('div');
+	$(mapDiv).css("height","400px");
+	var map = new google.maps.Map(mapDiv, options);
+	//polyligne
+	for(i=1;i<dataSize;i++){
+	    var route = [];
+	    route.push(new google.maps.LatLng(latArray[i-1], lonArray[i-1]));
+	    route.push(new google.maps.LatLng(latArray[i], lonArray[i]));
+	    var itinerary = new google.maps.Polyline({
+		path: route,
+		strokeOpacity: 1.0,
+		strokeColor: "#FF0000",
+		strokeWeight: 4
+	    });
+	    
+	    itinerary.setMap(map);
+	}
+	
+	var start = new google.maps.LatLng(firstlat, firstlon);
+	var finish = new google.maps.LatLng(lastlat, lastlon);
+	var marker1 = new google.maps.Marker({
+	    position: start,
+	    map: map,
+	    title: "Start"
+	});
+	var marker2 = new google.maps.Marker({
+	    position: finish,
+	    map: map,
+	    title: "Finish"
+	});
+	var markerBounds = new google.maps.LatLngBounds();
+	markerBounds.extend(start);
+	markerBounds.extend(finish);
+	map.fitBounds(markerBounds);		
+	
+	$('#'+displayDiv).find('#data').append(mapDiv);
+    }
 }
 
 //create an associative array with all the senML data
@@ -718,31 +724,35 @@ function getDataArray(dataArray,senML,currentSensor,sensorNumber) {
 //Generate Javascript function 
 function getJavascript (jsModal) {
 
-	var parser = new DOMParser();
-	var jsonVisu = [];
-	var domData=$(document.createElement('div')).html(localStorage.getItem("visualisations"));
-	$.each($(domData).find('tr'),function(i,visu) {
-		var visuObject = {"name":$(visu).children('td:first').find('span').text(),"type":$(visu).children('td').get(1).innerHTML,"sensors":[]}
-		$.each($($(visu).children('td').get(2)).children('div'),function(i,sensor) {
-			visuObject.sensors.push($(sensor).text());
-		});
-		jsonVisu.push(visuObject);
+    var parser = new DOMParser();
+    var jsonVisu = [];
+    var domData=$(document.createElement('div')).html(localStorage.getItem("visualisations"));
+    $.each($(domData).find('tr'),function(i,visu) {
+	var visuObject = {"name":$(visu).children('td:first').find('span').text(),"type":$(visu).children('td').get(1).innerHTML,"sensors":[]}
+	$.each($($(visu).children('td').get(2)).children('div'),function(i,sensor) {
+	    visuObject.sensors.push($(sensor).text());
 	});
-
-	var jsString = "";
-
-	jsString+="<script src='http://code.jquery.com/jquery-latest.js'></script>";
-	
-	jsString+="<script src='https://raw.github.com/mosser/sensapp-admin/master/net.modelbased.sensapp.admin.gui/src/main/webapp/DataTables-1.9.1/media/js/jquery.dataTables.js'></script>";	
-	jsString+="<script src='https://raw.github.com/mosser/sensapp-admin/master/net.modelbased.sensapp.admin.gui/src/main/webapp/javascripts/genericFunctions.js'></script>";
-	jsString+="<script src='https://raw.github.com/mosser/sensapp-admin/master/net.modelbased.sensapp.admin.gui/src/main/webapp/javascripts/topology.js'></script>";
-	jsString+="<script src='https://raw.github.com/mosser/sensapp-admin/master/net.modelbased.sensapp.admin.gui/src/main/webapp/javascripts/dashboard.js'></script>";
-	jsString+="<script src='https://raw.github.com/mosser/sensapp-admin/master/net.modelbased.sensapp.admin.gui/src/main/webapp/highstock/js/highstock.js'></script>";
-	jsString+="<script src='https://raw.github.com/mosser/sensapp-admin/master/net.modelbased.sensapp.admin.gui/src/main/webapp/highstock/js/modules/exporting.js'></script>";
-	jsString+="<script src='http://maps.googleapis.com/maps/api/js?key=AIzaSyBqAcd9tICH9qmHGL3ieuYoz3WSITCsCic&sensor=false'></script>";
-	jsString+="<script>var jsonVisu="+JSON.stringify(jsonVisu)+";";
-	jsString+="generateFromJson(jsonVisu,'body');</script>";
-	
-	alert($('#'+jsModal).find('.modal-body').attr('id'));
-	$('#'+jsModal).find('.modal-body').text(jsString);
-}
+	jsonVisu.push(visuObject);
+    });
+    
+    var jsString = "";
+    
+    jsString+="<script src='https://raw.github.com/SINTEF-9012/sensapp-admin/master/net.modelbased.sensapp.admin.gui/src/main/webapp/javascripts/jquery-1.7.2.min.js'></script>";
+    
+    jsString+="<script src='https://raw.github.com/SINTEF-9012/sensapp-admin/master/net.modelbased.sensapp.admin.gui/src/main/webapp/DataTables-1.9.1/media/js/jquery.dataTables.js'></script>";	
+    jsString+="<script src='https://raw.github.com/SINTEF-9012/sensapp-admin/master/net.modelbased.sensapp.admin.gui/src/main/webapp/javascripts/genericFunctions.js'></script>";
+    jsString+="<script src='https://raw.github.com/SINTEF-9012/sensapp-admin/master/net.modelbased.sensapp.admin.gui/src/main/webapp/javascripts/topology.js'></script>";
+    jsString+="<script src='https://raw.github.com/SINTEF-9012/sensapp-admin/master/net.modelbased.sensapp.admin.gui/src/main/webapp/javascripts/dashboard.js'></script>";
+    jsString+="<script src='https://raw.github.com/SINTEF-9012/sensapp-admin/master/net.modelbased.sensapp.admin.gui/src/main/webapp/highstock/js/highstock.js'></script>";
+    jsString+="<script src='https://raw.github.com/SINTEF-9012/sensapp-admin/master/net.modelbased.sensapp.admin.gui/src/main/webapp/highstock/js/modules/exporting.js'></script>";
+    jsString+="<script src='http://maps.googleapis.com/maps/api/js?key=AIzaSyBqAcd9tICH9qmHGL3ieuYoz3WSITCsCic&sensor=false'></script>";
+    jsString+="<script>var jsonVisu="+JSON.stringify(jsonVisu)+";";
+    jsString+="generateFromJson(jsonVisu,'main');</script>";
+    
+    var htmlString = "<html><body><div id=\"main\"><div id=\"data\"></div>";
+    htmlString += jsString;
+    htmlString += "</body></html>"
+    
+    //alert($('#'+jsModal).find('.modal-body').attr('id'));
+    $('#'+jsModal).find('.modal-body').text(htmlString);
+}3
